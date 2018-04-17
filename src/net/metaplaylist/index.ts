@@ -17,7 +17,9 @@
 import { Observable } from "rxjs/Observable";
 import request from "../../utils/request";
 
-import { IPrivateInfos } from "../../manifest/representation_index/interfaces";
+import objectAssign = require("object-assign");
+
+import { IPrivateInfos, ISegment } from "../../manifest/representation_index/interfaces";
 import parseMetaManifest from "../../parsers/manifest/metaplaylist";
 import {
   ILoaderObservable,
@@ -101,6 +103,47 @@ function parseMetaPlaylistData(data: string): IMetaPlaylist {
   });
 
   return { contents, attributes };
+}
+
+/**
+ * Get parsers base arguments from segment indexes.
+ */
+function getParserBaseArguments<T>(
+  segment: ISegment,
+  metaplaylistArguments: ISegmentParserArguments<T>,
+  offset?: number
+): ISegmentParserArguments<T>;
+function getParserBaseArguments(
+  segment: ISegment,
+  metaplaylistArguments: ISegmentLoaderArguments,
+  offset?: number
+): ISegmentLoaderArguments;
+function getParserBaseArguments<T>(
+  segment: ISegment,
+  metaplaylistArguments: ISegmentParserArguments<T>|ISegmentLoaderArguments,
+  offset?: number
+): ISegmentParserArguments<T>|ISegmentLoaderArguments {
+  const originalSegment =
+    offset ?
+      objectAssign(
+        {},
+        segment,
+        { time: segment.isInit ? segment.time : segment.time - offset }
+      ) :
+      segment;
+
+  if (segment.privateInfos && segment.privateInfos.baseContentInfos) {
+    const contentInfos = segment.privateInfos.baseContentInfos;
+    return objectAssign({}, metaplaylistArguments, {
+      manifest: contentInfos.manifest,
+      period: contentInfos.period || metaplaylistArguments.period,
+      adaptation: contentInfos.adaptation || metaplaylistArguments.adaptation,
+      representation: contentInfos.representation || metaplaylistArguments.representation,
+      segment: originalSegment,
+    });
+  } else {
+    return objectAssign({}, metaplaylistArguments, { segment: originalSegment });
+  }
 }
 
 /**
@@ -211,14 +254,12 @@ export default function(options: IParserOptions = {}): ITransportPipelines {
     };
 
     const segmentPipeline = {
-      loader({
-        adaptation,
-        init,
-        manifest,
-        period,
-        representation,
-        segment,
-      } : ISegmentLoaderArguments) : ILoaderObservable<Uint8Array|ArrayBuffer> {
+      loader(args : ISegmentLoaderArguments) : ILoaderObservable<Uint8Array|ArrayBuffer> {
+        const {
+          segment,
+          period,
+          init,
+        } = args;
         if (!segment.privateInfos) {
           throw new Error("Segments from metaplaylist must have private infos.");
         }
@@ -226,14 +267,10 @@ export default function(options: IParserOptions = {}): ITransportPipelines {
           getTransportTypeFromSegmentPrivateInfos(segment.privateInfos);
         const transport = transports[transportType];
         const segmentLoader = transport.video.loader;
-        return segmentLoader({
-          adaptation,
-          init,
-          manifest,
-          period,
-          representation,
-          segment,
-        });
+        const offset = (period.start || 0) *
+          (init ? (init.timescale || segment.timescale) :  segment.timescale);
+        const parserArgs = getParserBaseArguments(segment, args, offset);
+        return segmentLoader(parserArgs);
       },
 
       parser(args : ISegmentParserArguments<Uint8Array|ArrayBuffer>
@@ -250,24 +287,22 @@ export default function(options: IParserOptions = {}): ITransportPipelines {
             throw new Error("Segments from metaplaylist must have private infos.");
           }
           const segmentParser = transport.video.parser;
+          const offset = (period.start || 0) *
+            (init ? (init.timescale || segment.timescale) :  segment.timescale);
 
-          return segmentParser(args).map(({ segmentData, segmentInfos }) => {
-            let segmentPatchedData;
-            const offset = (period.start || 0) *
-              (init ? (init.timescale || segment.timescale) :  segment.timescale);
+          const parserArgs = getParserBaseArguments(segment, args, offset);
 
-            if (segmentData != null) {
-              const responseData = segmentData instanceof Uint8Array ?
-                segmentData :
-                new Uint8Array(segmentData);
+          return segmentParser(parserArgs).map(({ segmentData, segmentInfos }) => {
+            const responseData = segmentData instanceof Uint8Array ?
+              segmentData :
+              new Uint8Array(segmentData);
 
-              segmentPatchedData =  patchBox(
-                responseData,
-                offset
-              );
-              if (segmentInfos) {
-                segmentInfos.time += offset;
-              }
+            const segmentPatchedData = patchBox(
+              responseData,
+              offset
+            );
+            if (segmentInfos && segmentInfos.time > -1) {
+              segmentInfos.time += offset;
             }
             return { segmentData: segmentPatchedData || null, segmentInfos };
           });
@@ -285,7 +320,9 @@ export default function(options: IParserOptions = {}): ITransportPipelines {
         const transportType =
           getTransportTypeFromSegmentPrivateInfos(args.segment.privateInfos);
         const transport = transports[transportType];
-        return transport.text.loader(args);
+        const offset = args.period.start;
+        const parserArgs = getParserBaseArguments(args.segment, args, offset);
+        return transport.text.loader(parserArgs);
       },
       parser: (
         args: ISegmentParserArguments<ArrayBuffer|string|Uint8Array|null>
@@ -296,9 +333,14 @@ export default function(options: IParserOptions = {}): ITransportPipelines {
         const transportType =
           getTransportTypeFromSegmentPrivateInfos(args.segment.privateInfos);
         const transport = transports[transportType];
-        return transport.text.parser(args).map((parsed) => {
+        const offset = args.period.start;
+        const parserArgs = getParserBaseArguments(args.segment, args, offset);
+        return transport.text.parser(parserArgs).map((parsed) => {
           if (parsed.segmentData != null) {
-            parsed.segmentData.timeOffset += args.period.start;
+            parsed.segmentData.timeOffset += offset;
+          }
+          if (parsed.segmentInfos && parsed.segmentInfos.time > -1) {
+            parsed.segmentInfos.time += offset;
           }
           return { segmentData: parsed.segmentData, segmentInfos: parsed.segmentInfos };
         });
@@ -315,7 +357,9 @@ export default function(options: IParserOptions = {}): ITransportPipelines {
         const transportType =
           getTransportTypeFromSegmentPrivateInfos(args.segment.privateInfos);
         const transport = transports[transportType];
-        return transport.image.loader(args);
+        const offset = args.period.start;
+        const parserArgs = getParserBaseArguments(args.segment, args, offset);
+        return transport.image.loader(parserArgs);
       },
       parser(
         args : ISegmentParserArguments<ArrayBuffer|Uint8Array|null>
@@ -327,9 +371,14 @@ export default function(options: IParserOptions = {}): ITransportPipelines {
           getTransportTypeFromSegmentPrivateInfos(args.segment.privateInfos);
         const transport = transports[transportType];
 
-        return transport.image.parser(args).map((parsed) => {
+        const offset = args.period.start;
+        const parserArgs = getParserBaseArguments(args.segment, args, offset);
+        return transport.image.parser(parserArgs).map((parsed) => {
           if (parsed.segmentData != null) {
-            parsed.segmentData.timeOffset += args.period.start;
+            parsed.segmentData.timeOffset += offset;
+          }
+          if (parsed.segmentInfos && parsed.segmentInfos.time > -1) {
+            parsed.segmentInfos.time += offset;
           }
           return parsed;
         });
