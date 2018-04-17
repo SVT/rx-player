@@ -76,10 +76,7 @@ export default class MetaRepresentationIndex implements IRepresentationIndex{
   }
 
   public shouldRefresh(__ : number, to : number) : boolean {
-    if (to > this._contentEnd) {
-      return true;
-    }
-    return false;
+    return to > this._contentEnd;
   }
 
   public getFirstPosition(): number|undefined {
