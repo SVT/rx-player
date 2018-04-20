@@ -18,6 +18,7 @@ import { Observable } from "rxjs/Observable";
 import Manifest, {
   Period,
 } from "../../manifest";
+import { IBufferType } from "../source_buffers";
 import {
   IBufferClockTick,
   IBufferStateFull,
@@ -37,9 +38,10 @@ import {
 export default function createFakeBuffer(
   bufferClock$ : Observable<IBufferClockTick>,
   wantedBufferAhead$ : Observable<number>,
+  bufferType : IBufferType,
   content : { manifest : Manifest; period : Period }
 ) : Observable<IBufferStateFull> {
-  const period = content.period;
+  const { period } = content;
   return Observable.combineLatest(bufferClock$, wantedBufferAhead$)
     .filter(([clockTick, wantedBufferAhead]) =>
       period.end != null && clockTick.currentTime + wantedBufferAhead >= period.end
@@ -47,7 +49,7 @@ export default function createFakeBuffer(
     .map(() => {
       return {
         type: "full-buffer" as "full-buffer",
-        value: undefined,
+        value: { bufferType },
       };
     });
 }
