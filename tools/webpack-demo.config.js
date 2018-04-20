@@ -53,6 +53,7 @@ const config = {
         HTML_TTML: true,
         HTML_SRT: true,
         HTML_VTT: true,
+        TOOLS: true,
       },
       "__DEV__": true,
       "__LOGGER_LEVEL__": "\"INFO\"",

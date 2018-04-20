@@ -69,6 +69,7 @@ import {
 } from "../../manifest/timings";
 import Transports from "../../net";
 import { IBifThumbnail } from "../../parsers/images/bif";
+import MediaCapabilitiesProber from "../../tools/mediaCapabilitiesProber";
 import ABRManager from "../abr";
 import {
   clearEMESession,
@@ -457,6 +458,13 @@ class Player extends EventEmitter<PLAYER_EVENT_STRINGS, any> {
    */
   static set LogLevel(logLevel : string) {
     log.setLevel(logLevel);
+  }
+
+  /**
+   * Provide media capabilities prober.
+   */
+  static get MediaCapabilitiesProber() {
+    return __FEATURES__.TOOLS_MCP ? MediaCapabilitiesProber : undefined;
   }
 
   /**

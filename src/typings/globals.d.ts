@@ -29,6 +29,7 @@ declare const __FEATURES__ : {
   NATIVE_SRT : boolean;
   NATIVE_TTML : boolean;
   NATIVE_VTT : boolean;
+  TOOLS_MCP: boolean;
 };
 
 // Map of string to anything
