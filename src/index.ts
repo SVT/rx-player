@@ -61,9 +61,11 @@ import "rxjs/add/operator/timeout";
 import logger from "./utils/log";
 
 import Player from "./core/api";
+import MediaCapabilitiesProber from "./tools/mediaCapabilitiesProber";
 
 if (__DEV__) {
   logger.setLevel(__LOGGER_LEVEL__);
 }
 
+export { MediaCapabilitiesProber };
 export default Player;
