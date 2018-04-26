@@ -1766,7 +1766,8 @@ function canPlay(mediaElement) {
 exports.canPlay = canPlay;
 // old WebKit SourceBuffer implementation,
 // where a synchronous append is used instead of appendBuffer
-if (window.WebKitSourceBuffer &&
+if (typeof window !== "undefined" &&
+    window.WebKitSourceBuffer &&
     !window.WebKitSourceBuffer.prototype.addEventListener) {
     var sourceBufferWebkitRef = window.WebKitSourceBuffer;
     var sourceBufferWebkitProto = sourceBufferWebkitRef.prototype;
@@ -3101,7 +3102,7 @@ var log_1 = __webpack_require__(1);
 var rx_onEvent_1 = __webpack_require__(52);
 var constants_1 = __webpack_require__(53);
 var INACTIVITY_DELAY = config_1.default.INACTIVITY_DELAY;
-var pixelRatio = window.devicePixelRatio || 1;
+var pixelRatio = (typeof window !== "undefined" && window.devicePixelRatio) || 1;
 /**
  * Find the first supported event from the list given.
  * @param {Element} element
@@ -3147,7 +3148,7 @@ function compatibleListener(eventNames, prefixes) {
     return function (element) {
         // if the element is a HTMLElement we can detect
         // the supported event, and memoize it in `mem`
-        if (element instanceof constants_1.HTMLElement_) {
+        if (constants_1.HTMLElement_ && element instanceof constants_1.HTMLElement_) {
             if (typeof mem === "undefined") {
                 mem = findSupportedEvent(element, prefixedEvents);
             }
@@ -3176,6 +3177,9 @@ function compatibleListener(eventNames, prefixes) {
  * @returns {Observable}
  */
 function visibilityChange() {
+    if (typeof document === "undefined") {
+        return Observable_1.Observable.never();
+    }
     var prefix;
     if (document.hidden != null) {
         prefix = "";
@@ -6351,20 +6355,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var MediaError_1 = __webpack_require__(31);
 var BROWSER_PREFIXES = ["", "webkit", "moz", "ms"];
 exports.BROWSER_PREFIXES = BROWSER_PREFIXES;
-var win = window;
-var HTMLElement_ = win.HTMLElement;
+var win = typeof window !== "undefined" ? window : undefined;
+var HTMLElement_ = win && win.HTMLElement;
 exports.HTMLElement_ = HTMLElement_;
-var VTTCue_ = win.VTTCue || win.TextTrackCue;
+var VTTCue_ = win && (win.VTTCue || win.TextTrackCue);
 exports.VTTCue_ = VTTCue_;
-var MediaSource_ = (win.MediaSource ||
+var MediaSource_ = (win && (win.MediaSource ||
     win.MozMediaSource ||
     win.WebKitMediaSource ||
-    win.MSMediaSource);
+    win.MSMediaSource));
 exports.MediaSource_ = MediaSource_;
-var MediaKeys_ = (win.MediaKeys ||
+var MediaKeys_ = (win && (win.MediaKeys ||
     win.MozMediaKeys ||
     win.WebKitMediaKeys ||
-    win.MSMediaKeys);
+    win.MSMediaKeys));
 exports.MediaKeys_ = MediaKeys_;
 if (!MediaKeys_) {
     var noMediaKeys_1 = function () {
@@ -6381,10 +6385,11 @@ if (!MediaKeys_) {
     }());
 }
 // true for IE / Edge
-var isIE = (navigator.appName === "Microsoft Internet Explorer" ||
-    navigator.appName === "Netscape" && /(Trident|Edge)\//.test(navigator.userAgent));
+var isIE = (typeof navigator !== "undefined" && (navigator.appName === "Microsoft Internet Explorer" ||
+    navigator.appName === "Netscape" && /(Trident|Edge)\//.test(navigator.userAgent)));
 exports.isIE = isIE;
-var isFirefox = (navigator.userAgent.toLowerCase().indexOf("firefox") !== -1);
+var isFirefox = (typeof navigator !== "undefined" &&
+    navigator.userAgent.toLowerCase().indexOf("firefox") !== -1);
 exports.isFirefox = isFirefox;
 var READY_STATES = {
     HAVE_NOTHING: 0,
@@ -9744,7 +9749,10 @@ var MockMediaKeys = /** @class */ (function () {
     return class_1;
 }());
 exports.MockMediaKeys = MockMediaKeys;
-if (navigator.requestMediaKeySystemAccess) {
+if (typeof navigator === "undefined") {
+    exports.requestMediaKeySystemAccess = requestMediaKeySystemAccess = null;
+}
+else if (navigator.requestMediaKeySystemAccess) {
     exports.requestMediaKeySystemAccess = requestMediaKeySystemAccess = function (a, b) {
         return castToObservable_1.default(navigator.requestMediaKeySystemAccess(a, b));
     };
