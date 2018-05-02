@@ -68,7 +68,7 @@ export interface IBufferNeedsDiscontinuitySeek {
 }
 
 // Events communicating about actions that need to be taken
-type IBufferNeededActions =
+export type IBufferNeededActions =
   IBufferNeedsManifestRefresh |
   IBufferNeedsDiscontinuitySeek;
 
@@ -96,7 +96,7 @@ type IBufferDownloadQueueState =
   IBufferStateActive |
   IBufferStateIdle;
 
-type IBufferStateEvent =
+export type IBufferStateEvent =
   IBufferNeededActions |
   IBufferStateFull |
   IBufferStateActive;

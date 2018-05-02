@@ -264,7 +264,7 @@ function calculateRepeat(
   return repeatCount;
 }
 
-interface ISmoothInitSegmentPrivateInfos {
+export interface ISmoothInitSegmentPrivateInfos {
   codecPrivateData : string;
   bitsPerSample? : number;
   channels? : number;

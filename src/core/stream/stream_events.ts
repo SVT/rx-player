@@ -15,7 +15,7 @@
  */
 
 import { Subject } from "rxjs/Subject";
-import { CustomError } from "../../errors";
+import * as errors from "../../errors";
 import Manifest, {
   Adaptation,
   Period,
@@ -56,7 +56,7 @@ export interface IManifestReadyEvent {
 
 export interface IStreamWarningEvent {
   type : "warning";
-  value : Error|CustomError;
+  value : Error|errors.CustomError;
 }
 
 export interface IManifestUpdateEvent {
@@ -219,7 +219,7 @@ function periodBufferCleared(
   };
 }
 
-function warning(value : Error | CustomError) : IStreamWarningEvent {
+function warning(value : Error | errors.CustomError) : IStreamWarningEvent {
   return {
     type: "warning",
     value,

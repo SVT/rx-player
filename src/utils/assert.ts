@@ -28,7 +28,7 @@ export default function assert(assertion : boolean, message? : string) {
   }
 }
 
-type IObjectInterface<T> = Partial<Record<keyof T, string>>;
+export type IObjectInterface<T> = Partial<Record<keyof T, string>>;
 
 /**
  * Throws if the given Object does not respect the interface.

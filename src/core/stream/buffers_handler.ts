@@ -60,12 +60,12 @@ import EVENTS, {
 } from "./stream_events";
 
 // Events coming from single PeriodBuffer
-type IPeriodBufferEvent =
+export type IPeriodBufferEvent =
   IAdaptationBufferEvent<any> |
   IAdaptationChangeEvent;
 
 // Events coming from function(s) managing multiple PeriodBuffers.
-type IMultiplePeriodBuffersEvent =
+export type IMultiplePeriodBuffersEvent =
   IPeriodBufferEvent |
   IPeriodBufferReadyEvent |
   IPeriodBufferClearedEvent |

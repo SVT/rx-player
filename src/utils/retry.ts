@@ -276,4 +276,5 @@ export {
   retryableFuncWithBackoff,
   retryFuncWithBackoff,
   CustomError,
+  IBackoffOptions,
 };

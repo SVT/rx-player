@@ -398,4 +398,5 @@ export {
   ISegment,
   ISupplementaryImageTrack,
   ISupplementaryTextTrack,
+  ManifestAdaptations,
 };

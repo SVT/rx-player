@@ -25,19 +25,14 @@ import {
   byteRange,
 } from "./utils";
 
-import {
-  CustomSegmentLoader,
-  ILoaderObservable,
-  ILoaderObserver,
-  ISegmentLoaderArguments,
-} from "../types";
+import * as types from '../types';
 
 const {
   createVideoInitSegment,
   createAudioInitSegment,
 } = mp4Utils;
 
-interface IRegularSegmentLoaderArguments extends ISegmentLoaderArguments {
+export interface IRegularSegmentLoaderArguments extends types.ISegmentLoaderArguments {
   url : string;
 }
 
@@ -50,7 +45,7 @@ interface IRegularSegmentLoaderArguments extends ISegmentLoaderArguments {
  */
 function regularSegmentLoader(
   { url, segment } : IRegularSegmentLoaderArguments
-) : ILoaderObservable<ArrayBuffer> {
+) : types.ILoaderObservable<ArrayBuffer> {
   let headers;
   const range = segment.range;
   if (range) {
@@ -71,7 +66,7 @@ function regularSegmentLoader(
  * one).
  */
 const generateSegmentLoader = (
-  customSegmentLoader? : CustomSegmentLoader
+  customSegmentLoader? : types.CustomSegmentLoader
 ) => ({
   segment,
   representation,
@@ -79,7 +74,7 @@ const generateSegmentLoader = (
   period,
   manifest,
   init,
-} : ISegmentLoaderArguments) : ILoaderObservable<Uint8Array|ArrayBuffer> => {
+} : types.ISegmentLoaderArguments) : types.ILoaderObservable<Uint8Array|ArrayBuffer> => {
   if (segment.isInit) {
     if (!segment.privateInfos || segment.privateInfos.type !== "smooth-init") {
       throw new Error("Smooth: Invalid segment format");
@@ -146,7 +141,7 @@ const generateSegmentLoader = (
       return regularSegmentLoader(args);
     }
 
-    return Observable.create((obs : ILoaderObserver<ArrayBuffer|Uint8Array>) => {
+    return Observable.create((obs : types.ILoaderObserver<ArrayBuffer|Uint8Array>) => {
       let hasFinished = false;
       let hasFallbacked = false;
 

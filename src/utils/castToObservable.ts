@@ -18,7 +18,7 @@ import { Observable } from "rxjs/Observable";
 
 import "rxjs/add/observable/fromPromise";
 
-interface IObservableLike<T> {
+export interface IObservableLike<T> {
   subscribe(
     next : (i: T) => void,
     error : (e: any) => void,

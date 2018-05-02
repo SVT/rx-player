@@ -382,4 +382,5 @@ export {
   itole2, itole4, itole8,
   guidToUuid,
   toBase64URL,
+  TypedArray,
 };

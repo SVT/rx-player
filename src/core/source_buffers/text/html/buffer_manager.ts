@@ -16,7 +16,7 @@
 
 import assert from "../../../../utils/assert";
 
-interface IHTMLCue {
+export interface IHTMLCue {
   start : number;
   end : number;
   element : HTMLElement;

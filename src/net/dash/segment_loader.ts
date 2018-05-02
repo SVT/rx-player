@@ -24,14 +24,9 @@ import {
   replaceTokens,
 } from "./utils";
 
-import {
-  CustomSegmentLoader,
-  ILoaderObservable,
-  ILoaderObserver,
-  ISegmentLoaderArguments,
-} from "../types";
+import * as types from "../types";
 
-interface IRegularSegmentLoaderArguments extends ISegmentLoaderArguments {
+export interface IRegularSegmentLoaderArguments extends types.ISegmentLoaderArguments {
   url : string;
 }
 
@@ -44,7 +39,7 @@ interface IRegularSegmentLoaderArguments extends ISegmentLoaderArguments {
  */
 function regularSegmentLoader(
   { url, segment } : IRegularSegmentLoaderArguments
-) : ILoaderObservable<ArrayBuffer> {
+) : types.ILoaderObservable<ArrayBuffer> {
   const { range, indexRange } = segment;
 
   // fire a single time contiguous init and index ranges.
@@ -91,13 +86,13 @@ function regularSegmentLoader(
  * @param {Function} [customSegmentLoader]
  * @returns {Function}
  */
-const segmentPreLoader = (customSegmentLoader? : CustomSegmentLoader) => ({
+const segmentPreLoader = (customSegmentLoader? : types.CustomSegmentLoader) => ({
   adaptation,
   manifest,
   period,
   representation,
   segment,
-} : ISegmentLoaderArguments) : ILoaderObservable<Uint8Array|ArrayBuffer> => {
+} : types.ISegmentLoaderArguments) : types.ILoaderObservable<Uint8Array|ArrayBuffer> => {
   const {
     media,
     range,
@@ -129,7 +124,7 @@ const segmentPreLoader = (customSegmentLoader? : CustomSegmentLoader) => ({
     return regularSegmentLoader(args);
   }
 
-  return Observable.create((obs : ILoaderObserver<Uint8Array|ArrayBuffer>) => {
+  return Observable.create((obs : types.ILoaderObserver<Uint8Array|ArrayBuffer>) => {
     let hasFinished = false;
     let hasFallbacked = false;
 

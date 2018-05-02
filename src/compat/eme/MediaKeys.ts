@@ -486,6 +486,8 @@ if (navigator.requestMediaKeySystemAccess) {
 
 export {
   IMockMediaKeys,
+  IMockMediaKeysConstructor,
+  MEDIA_KEY_SESSION_EVENTS,
   MockMediaKeys,
   requestMediaKeySystemAccess,
 };

@@ -45,7 +45,7 @@ function isOfflineRequestError(error : RequestError) : boolean {
   return error.type === RequestErrorTypes.ERROR_EVENT && isOffline();
 }
 
-interface IDownloadingBackoffOptions {
+export interface IDownloadingBackoffOptions {
   baseDelay : number;
   maxDelay : number;
   maxRetryRegular : number;

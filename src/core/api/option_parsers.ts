@@ -43,11 +43,11 @@ const {
 
 // TODO
 // Set a real interface for transport options (i.e. same for DASH and SMOOTH).
-interface ITransportOption {
+export interface ITransportOption {
   [keyName : string] : any;
 }
 
-interface ISupplementaryTextTrackOption {
+export interface ISupplementaryTextTrackOption {
   url : string;
   language : string;
   closedCaption : boolean;
@@ -55,30 +55,30 @@ interface ISupplementaryTextTrackOption {
   codecs? : string;
 }
 
-interface ISupplementaryImageTrackOption {
+export interface ISupplementaryImageTrackOption {
   url : string;
   mimeType : string;
 }
 
-interface IDefaultAudioTrackOption {
+export interface IDefaultAudioTrackOption {
   language : string;
   normalized : string;
   audioDescription : boolean;
 }
 
-interface IDefaultTextTrackOption {
+export interface IDefaultTextTrackOption {
   language : string;
   normalized : string;
   closedCaption : boolean;
 }
 
-interface INetworkConfigOption {
+export interface INetworkConfigOption {
   manifestRetry? : number;
   offlineRetry? : number;
   segmentRetry? : number;
 }
 
-type IParsedStartAtOption = { position : number } | { wallClockTime : number } |
+export type IParsedStartAtOption = { position : number } | { wallClockTime : number } |
   { percentage : number } | { fromLastPosition : number } |
   { fromFirstPosition : number };
 
@@ -114,7 +114,7 @@ export interface IParsedConstructorOptions {
   stopAtEnd : boolean;
 }
 
-interface ILoadVideoOptionsBase {
+export interface ILoadVideoOptionsBase {
   url : string;
   transport : string;
   autoPlay? : boolean;
@@ -130,19 +130,19 @@ interface ILoadVideoOptionsBase {
     { fromFirstPosition : number };
 }
 
-interface ILoadVideoOptionsNative extends ILoadVideoOptionsBase {
+export interface ILoadVideoOptionsNative extends ILoadVideoOptionsBase {
   textTrackMode? : "native";
   hideNativeSubtitle? : boolean;
 }
 
-interface ILoadVideoOptionsHTML extends ILoadVideoOptionsBase {
+export interface ILoadVideoOptionsHTML extends ILoadVideoOptionsBase {
   textTrackMode : "html";
   textTrackElement : HTMLElement;
 }
 
 export type ILoadVideoOptions = ILoadVideoOptionsNative | ILoadVideoOptionsHTML;
 
-interface IParsedLoadVideoOptionsBase {
+export interface IParsedLoadVideoOptionsBase {
   url : string;
   transport : string;
   autoPlay : boolean;
@@ -156,12 +156,12 @@ interface IParsedLoadVideoOptionsBase {
   startAt : IParsedStartAtOption|undefined;
 }
 
-interface IParsedLoadVideoOptionsNative extends IParsedLoadVideoOptionsBase {
+export interface IParsedLoadVideoOptionsNative extends IParsedLoadVideoOptionsBase {
   textTrackMode : "native";
   hideNativeSubtitle : boolean;
 }
 
-interface IParsedLoadVideoOptionsHTML extends IParsedLoadVideoOptionsBase {
+export interface IParsedLoadVideoOptionsHTML extends IParsedLoadVideoOptionsBase {
   textTrackMode : "html";
   textTrackElement : HTMLElement;
 }

@@ -37,7 +37,7 @@ type IPipelineManifestResult =
   IPipelineData<IManifestResult> |
   IPipelineCache<IManifestResult>;
 
-type IPipelineManifestOptions =
+export type IPipelineManifestOptions =
   IPipelineOptions<IManifestLoaderArguments, Document|string>;
 
 /**

@@ -408,4 +408,5 @@ export {
   keepRangeIntersection,
   mergeContiguousRanges,
   removeEmptyRanges,
+  IRange,
 };

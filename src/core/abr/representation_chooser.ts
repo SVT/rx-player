@@ -568,4 +568,7 @@ export {
   IRequest,
   IRepresentationChooserClockTick,
   IRepresentationChooserOptions,
+  IBeginRequest,
+  IEndRequest,
+  IProgressRequest,
 };

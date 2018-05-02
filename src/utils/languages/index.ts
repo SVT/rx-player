@@ -149,6 +149,8 @@ export {
   normalize,
   normalizeAudioTrack,
   normalizeTextTrack,
+  IMinimalAudioTrackObject,
+  IMinimalTextTrackObject,
   INormalizedTextTrackObject,
   INormalizedAudioTrackObject,
 };

@@ -22,7 +22,7 @@ import log from "../../../utils/log";
 import SessionSet from "./abstract";
 import hashInitData from "./hash_init_data";
 
-interface IPersistedSessionData {
+export interface IPersistedSessionData {
   sessionId : string;
   initData : number;
 }

@@ -118,7 +118,7 @@ interface IBitrateEstimate {
   bitrate : number|undefined;
 }
 
-type PLAYER_EVENT_STRINGS =
+export type PLAYER_EVENT_STRINGS =
   "playerStateChange" |
   "positionUpdate" |
   "audioTrackChange" |

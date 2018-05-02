@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "allowJs": true,
+    "declaration": true,
     "target": "es5",
     "lib": ["es2017", "dom"],
     "strict": true,
@@ -16,8 +16,5 @@
       "./src/typings",
       "./node_modules/@types"
     ]
-  },
-  "include": [
-    "./src/**/*.ts"
-  ]
+  }
 }

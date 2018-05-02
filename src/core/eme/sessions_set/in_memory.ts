@@ -25,7 +25,7 @@ import SessionSet from "./abstract";
 import hashInitData from "./hash_init_data";
 
 // Cached data for a single MediaKeySession
-interface ISessionData {
+export interface ISessionData {
   initData : number;
   session : IMediaKeySession|MediaKeySession;
   eventSubscription : Subscription;

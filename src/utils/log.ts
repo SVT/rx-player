@@ -24,7 +24,7 @@ const LEVELS : { [level : string] : number } = {
   DEBUG: 4,
 };
 
-type tConsoleFn = (...args : any[]) => void;
+export type tConsoleFn = (...args : any[]) => void;
 
 let currentLevel : string = Object.keys(LEVELS)[0];
 

@@ -38,7 +38,7 @@ export interface ISegmentBaseAttributes {
   timescale?: number;
 }
 
-interface ISegmentBaseSegment {
+export interface ISegmentBaseSegment {
   ts: number; // start timestamp
   d: number; // duration
   r: number; // repeat counter

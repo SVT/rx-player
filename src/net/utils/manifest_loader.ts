@@ -17,11 +17,7 @@
 import { Observable } from "rxjs/Observable";
 import request from "../../utils/request";
 
-import {
-  CustomManifestLoader,
-  ILoaderObservable,
-  ILoaderObserver,
-} from "../types";
+import * as types from '../types';
 
 /**
  * Manifest loader triggered if there was no custom-defined one in the API.
@@ -45,15 +41,15 @@ function regularManifestLoader(
  */
 const manifestPreLoader = (
   options: {
-    customManifestLoader?: CustomManifestLoader;
+    customManifestLoader?: types.CustomManifestLoader;
     ignoreProgressEvents?: true;
-  }) => (url: string) : ILoaderObservable<Document|string> => {
+  }) => (url: string) : types.ILoaderObservable<Document|string> => {
     const { customManifestLoader, ignoreProgressEvents } = options;
     if (!customManifestLoader) {
       return regularManifestLoader(url, ignoreProgressEvents);
     }
 
-    return Observable.create((obs: ILoaderObserver<Document|string>) => {
+    return Observable.create((obs: types.ILoaderObserver<Document|string>) => {
       let hasFinished = false;
       let hasFallbacked = false;
 

@@ -323,5 +323,6 @@ export default class ABRManager {
 export {
   IRequest as IABRRequest,
   IMetric as IABRMetric,
+  IMetricValue as IABRMetricValue,
   IRepresentationChoosersOptions as IABROptions,
 };

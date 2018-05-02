@@ -21,7 +21,7 @@ type IListeners<T extends string, U> =
     T,
     Array<listenerFunction<U>>
   >>;
-type listenerFunction<U> = (payload : U) => void;
+export type listenerFunction<U> = (payload : U) => void;
 
 export default class EventEmitter<T extends string, U> {
   /**

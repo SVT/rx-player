@@ -21,7 +21,7 @@ import {
 
 import errorMessage from "./errorMessage";
 
-type IEncryptedMediaErrorReason =
+export type IEncryptedMediaErrorReason =
   Error|Event|string|null;
 
 /**

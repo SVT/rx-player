@@ -83,7 +83,7 @@ export interface ILoaderProgress {
 }
 
 // items emitted by net/ pipelines' loaders on xhr response events
-interface ILoaderData<T> {
+export interface ILoaderData<T> {
   type : "data";
   value : {
     responseData: T;
@@ -158,7 +158,7 @@ export type ImageParserObservable = Observable<{
   segmentInfos : ISegmentTimingInfos|null;
 }>;
 
-interface ITransportManifestPipeline {
+export interface ITransportManifestPipeline {
   // TODO Remove resolver
   resolver?: (x : IManifestLoaderArguments) =>
     Observable<IManifestLoaderArguments>;
@@ -168,7 +168,7 @@ interface ITransportManifestPipeline {
     IManifestParserObservable;
 }
 
-interface ITransportSegmentPipelineBase<T> {
+export interface ITransportSegmentPipelineBase<T> {
   loader : (x : ISegmentLoaderArguments) => ILoaderObservable<T>;
   parser: (x : ISegmentParserArguments<T>) => SegmentParserObservable;
 }

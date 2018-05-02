@@ -35,7 +35,7 @@ import BasePipeline, {
   IPipelineOptions,
 } from "../core_pipeline";
 
-interface ISegmentResponseParsed<T> {
+export interface ISegmentResponseParsed<T> {
   segmentData : T;
   segmentInfos : {
     duration : number;

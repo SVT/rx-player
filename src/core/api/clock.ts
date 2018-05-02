@@ -30,7 +30,7 @@ import { getLeftSizeOfRange, getRange } from "../../utils/ranges";
 
 // Informations recuperated on the video element on each clock
 // tick
-interface IVideoInfos {
+export interface IVideoInfos {
   bufferGap : number;
   buffered : TimeRanges;
   currentRange : {
@@ -47,7 +47,7 @@ interface IVideoInfos {
   state : string;
 }
 
-type stalledStatus = {
+export type stalledStatus = {
   reason : "seeking" | "not-ready" | "buffering";
   timestamp : number;
 } | null;

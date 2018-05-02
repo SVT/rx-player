@@ -45,14 +45,14 @@ const {
  */
 // const SEGMENT_EPSILON = 0.3;
 
-interface IBufferedSegmentInfos {
+export interface IBufferedSegmentInfos {
   adaptation : Adaptation;
   period : Period;
   representation : Representation;
   segment : ISegment;
 }
 
-interface IBufferedSegment {
+export interface IBufferedSegment {
   bufferedEnd : number|undefined;
   bufferedStart : number|undefined;
   end : number;

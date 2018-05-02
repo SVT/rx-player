@@ -407,6 +407,7 @@ function patchPssh(buf : Uint8Array, pssList : IISOBMFFKeySystem[]) : Uint8Array
 }
 
 export {
+  IISOBMFFKeySystem,
   getMDHDTimescale,
   parseTfdt,
   getDurationFromTrun,

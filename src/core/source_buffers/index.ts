@@ -46,7 +46,7 @@ export type ISourceBufferOptions =
   ITextTrackSourceBufferOptions;
 
 // Types of "native" SourceBuffers
-type INativeSourceBufferType = "audio" | "video";
+export type INativeSourceBufferType = "audio" | "video";
 
 interface ICreatedSourceBuffer<T> {
   codec : string;
