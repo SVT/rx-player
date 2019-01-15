@@ -82,11 +82,8 @@ function areNearlyEqual(a : number, b : number) : boolean {
 function getCuesBefore(cues : IHTMLCue[], time : number) : IHTMLCue[] {
   for (let i = 0; i < cues.length; i++) {
     const cue = cues[i];
-    if (time < cue.end) {
-      if (time >= cue.start) {
-        return cues.slice(0, i);
-      }
-      return cues.slice(0, i + 1);
+    if (time < cue.start) {
+      return cues.slice(0, i);
     }
   }
   return cues.slice();
