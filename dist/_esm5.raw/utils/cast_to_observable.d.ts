@@ -1,0 +1,31 @@
+/**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+import { Observable } from "rxjs";
+interface IObservableLike<T> {
+    subscribe(next: (i: T) => void, error: (e: any) => void, complete: () => void): ({
+        dispose?: () => void;
+        unsubscribe?: () => void;
+    } | void);
+}
+/**
+ * Try to cast the given value into an observable.
+ * StraightForward - test first for an Observable then for a Promise.
+ * @param {Observable|Function|*}
+ * @returns {Observable}
+ */
+declare function castToObservable<T>(value: Observable<T> | IObservableLike<T> | Promise<T>): Observable<T>;
+declare function castToObservable<T>(value?: T): Observable<T>;
+export default castToObservable;

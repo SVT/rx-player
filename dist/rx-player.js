@@ -2414,6 +2414,106 @@ object-assign
     /* 21 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
+        // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/Observable.js + 3 modules
+                var Observable = __webpack_require__(5), config = __webpack_require__(2), error_codes = __webpack_require__(20), request_error = __webpack_require__(178), DEFAULT_REQUEST_TIMEOUT = config.a.DEFAULT_REQUEST_TIMEOUT;
+        // EXTERNAL MODULE: ./src/config.ts
+                /**
+ * @param {string} data
+ * @returns {Object|null}
+ */
+        function toJSONForIE(data) {
+            try {
+                return JSON.parse(data);
+            } catch (e) {
+                return null;
+            }
+        }
+        /* harmony default export */ var xhr_request = function request(options) {
+            var requestOptions = {
+                url: options.url,
+                headers: options.headers,
+                responseType: null == options.responseType ? "json" : options.responseType,
+                timeout: null == options.timeout ? DEFAULT_REQUEST_TIMEOUT : options.timeout
+            };
+            return Observable.a.create(function(obs) {
+                var url = requestOptions.url, headers = requestOptions.headers, responseType = requestOptions.responseType, timeout = requestOptions.timeout, xhr = new XMLHttpRequest();
+                if (xhr.open("GET", url, !0), 0 <= timeout && (xhr.timeout = timeout), xhr.responseType = responseType, 
+                "document" === xhr.responseType && xhr.overrideMimeType("text/xml"), headers) {
+                    var _headers = headers;
+                    for (var key in _headers) _headers.hasOwnProperty(key) && xhr.setRequestHeader(key, _headers[key]);
+                }
+                var sendingTime = performance.now();
+                return xhr.onerror = function onXHRError() {
+                    var errorCode = error_codes.c.ERROR_EVENT;
+                    obs.error(new request_error.a(xhr, url, errorCode));
+                }, xhr.ontimeout = function onXHRTimeout() {
+                    var errorCode = error_codes.c.TIMEOUT;
+                    obs.error(new request_error.a(xhr, url, errorCode));
+                }, options.ignoreProgressEvents || (xhr.onprogress = function onXHRProgress(event) {
+                    var currentTime = performance.now();
+                    obs.next({
+                        type: "progress",
+                        value: {
+                            url: url,
+                            duration: currentTime - sendingTime,
+                            sendingTime: sendingTime,
+                            currentTime: currentTime,
+                            size: event.loaded,
+                            totalSize: event.total
+                        }
+                    });
+                }), xhr.onload = function onXHRLoad(event) {
+                    if (4 === xhr.readyState) if (200 <= xhr.status && xhr.status < 300) {
+                        var responseData, receivedTime = performance.now(), totalSize = xhr.response instanceof ArrayBuffer ? xhr.response.byteLength : event.total, status = xhr.status, loadedResponseType = xhr.responseType, _url = xhr.responseURL || url;
+                        if (null == (
+                        // IE bug where response is string with responseType json
+                        responseData = "json" === loadedResponseType ? "string" !== xhr.response ? xhr.response : toJSONForIE(xhr.responseText) : xhr.response)) {
+                            var errorCode = error_codes.c.PARSE_ERROR;
+                            return void obs.error(new request_error.a(xhr, _url, errorCode));
+                        }
+                        obs.next({
+                            type: "response",
+                            value: {
+                                status: status,
+                                url: _url,
+                                responseType: loadedResponseType,
+                                sendingTime: sendingTime,
+                                receivedTime: receivedTime,
+                                duration: receivedTime - sendingTime,
+                                size: totalSize,
+                                responseData: responseData
+                            }
+                        }), obs.complete();
+                    } else {
+                        var _errorCode = error_codes.c.ERROR_HTTP_CODE;
+                        obs.error(new request_error.a(xhr, url, _errorCode));
+                    }
+                }, xhr.send(), function() {
+                    xhr && 4 !== xhr.readyState && xhr.abort();
+                };
+            });
+        };
+        // CONCATENATED MODULE: ./src/utils/request/index.ts
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        /* harmony default export */        __webpack_exports__.a = xhr_request;
+    }, 
+    /* 22 */
+    /***/ function(module, __webpack_exports__, __webpack_require__) {
+        "use strict";
         /**
  * Copyright 2015 CANAL+ Group
  *
@@ -2513,106 +2613,6 @@ object-assign
             }
         };
         /* harmony default export */        __webpack_exports__.a = INIT_EVENTS;
-    }, 
-    /* 22 */
-    /***/ function(module, __webpack_exports__, __webpack_require__) {
-        "use strict";
-        // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/Observable.js + 3 modules
-                var Observable = __webpack_require__(5), config = __webpack_require__(2), error_codes = __webpack_require__(20), request_error = __webpack_require__(178), DEFAULT_REQUEST_TIMEOUT = config.a.DEFAULT_REQUEST_TIMEOUT;
-        // EXTERNAL MODULE: ./src/config.ts
-                /**
- * @param {string} data
- * @returns {Object|null}
- */
-        function toJSONForIE(data) {
-            try {
-                return JSON.parse(data);
-            } catch (e) {
-                return null;
-            }
-        }
-        /* harmony default export */ var xhr_request = function request(options) {
-            var requestOptions = {
-                url: options.url,
-                headers: options.headers,
-                responseType: null == options.responseType ? "json" : options.responseType,
-                timeout: null == options.timeout ? DEFAULT_REQUEST_TIMEOUT : options.timeout
-            };
-            return Observable.a.create(function(obs) {
-                var url = requestOptions.url, headers = requestOptions.headers, responseType = requestOptions.responseType, timeout = requestOptions.timeout, xhr = new XMLHttpRequest();
-                if (xhr.open("GET", url, !0), 0 <= timeout && (xhr.timeout = timeout), xhr.responseType = responseType, 
-                "document" === xhr.responseType && xhr.overrideMimeType("text/xml"), headers) {
-                    var _headers = headers;
-                    for (var key in _headers) _headers.hasOwnProperty(key) && xhr.setRequestHeader(key, _headers[key]);
-                }
-                var sendingTime = performance.now();
-                return xhr.onerror = function onXHRError() {
-                    var errorCode = error_codes.c.ERROR_EVENT;
-                    obs.error(new request_error.a(xhr, url, errorCode));
-                }, xhr.ontimeout = function onXHRTimeout() {
-                    var errorCode = error_codes.c.TIMEOUT;
-                    obs.error(new request_error.a(xhr, url, errorCode));
-                }, options.ignoreProgressEvents || (xhr.onprogress = function onXHRProgress(event) {
-                    var currentTime = performance.now();
-                    obs.next({
-                        type: "progress",
-                        value: {
-                            url: url,
-                            duration: currentTime - sendingTime,
-                            sendingTime: sendingTime,
-                            currentTime: currentTime,
-                            size: event.loaded,
-                            totalSize: event.total
-                        }
-                    });
-                }), xhr.onload = function onXHRLoad(event) {
-                    if (4 === xhr.readyState) if (200 <= xhr.status && xhr.status < 300) {
-                        var responseData, receivedTime = performance.now(), totalSize = xhr.response instanceof ArrayBuffer ? xhr.response.byteLength : event.total, status = xhr.status, loadedResponseType = xhr.responseType, _url = xhr.responseURL || url;
-                        if (null == (
-                        // IE bug where response is string with responseType json
-                        responseData = "json" === loadedResponseType ? "string" !== xhr.response ? xhr.response : toJSONForIE(xhr.responseText) : xhr.response)) {
-                            var errorCode = error_codes.c.PARSE_ERROR;
-                            return void obs.error(new request_error.a(xhr, _url, errorCode));
-                        }
-                        obs.next({
-                            type: "response",
-                            value: {
-                                status: status,
-                                url: _url,
-                                responseType: loadedResponseType,
-                                sendingTime: sendingTime,
-                                receivedTime: receivedTime,
-                                duration: receivedTime - sendingTime,
-                                size: totalSize,
-                                responseData: responseData
-                            }
-                        }), obs.complete();
-                    } else {
-                        var _errorCode = error_codes.c.ERROR_HTTP_CODE;
-                        obs.error(new request_error.a(xhr, url, _errorCode));
-                    }
-                }, xhr.send(), function() {
-                    xhr && 4 !== xhr.readyState && xhr.abort();
-                };
-            });
-        };
-        // CONCATENATED MODULE: ./src/utils/request/index.ts
-        /**
- * Copyright 2015 CANAL+ Group
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-        /* harmony default export */        __webpack_exports__.a = xhr_request;
     }, 
     /* 23 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
@@ -6813,7 +6813,7 @@ object-assign
     /* 90 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
-        /* harmony import */        var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5), _utils_request__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(22);
+        /* harmony import */        var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5), _utils_request__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(21);
         /* harmony import */        
         /**
  * Copyright 2015 CANAL+ Group
@@ -7680,13 +7680,13 @@ object-assign
                     parsedPeriod;
                 }).sort(function(a, b) {
                     return a.start - b.start;
-                }), 
+                }), args.utcTimings && 0 < args.utcTimings.length && args.utcTimings[0].value && (_this._clockOffset = Date.now() - Date.parse(args.utcTimings[0].value), 
+                log.a.info("Manifest: Clock offset set to " + _this._clockOffset + "."))
                 /**
      * @deprecated It is here to ensure compatibility with the way the
      * v3.x.x manages adaptations at the Manifest level
      */
-                /* tslint:disable:deprecation */
-                _this.adaptations = _this.periods[0] && _this.periods[0].adaptations || {}, 
+                /* tslint:disable:deprecation */ , _this.adaptations = _this.periods[0] && _this.periods[0].adaptations || {}, 
                 /* tslint:enable:deprecation */
                 _this.minimumTime = args.minimumTime, _this.isLive = args.isLive, _this.uris = args.uris || [], 
                 _this.lifetime = args.lifetime, _this.suggestedPresentationDelay = args.suggestedPresentationDelay, 
@@ -7790,6 +7790,8 @@ object-assign
                                 newPeriodCounter < newPeriods.length && (log.a.info("Manifest: Adding new periods after update."), 
                 (_this$periods = this.periods).push.apply(_this$periods, newPeriods.slice(newPeriodCounter)));
                 this.trigger("manifestUpdate", null);
+            }, _proto.getTime = function getTime() {
+                return Date.now() - (this._clockOffset || 0);
             }
             /**
    * Get minimum position currently defined by the Manifest, in seconds.
@@ -7806,7 +7808,7 @@ object-assign
                     return null == duration ? Infinity : duration;
                 }
                 var ast = this.availabilityStartTime || 0, plg = this.presentationLiveGap || 0;
-                return Date.now() / 1e3 - ast - plg;
+                return this.getTime() / 1e3 - ast - plg;
             }
             /**
    * Get minimum AND maximum positions currently defined by the manifest, in
@@ -7814,12 +7816,12 @@ object-assign
    * @returns {Array.<number>}
    */ , _proto.getCurrentPositionLimits = function getCurrentPositionLimits() {
                 // TODO use RTT for the manifest request? (+ 3 or something)
-                var ast = this.availabilityStartTime || 0, minimumTime = null != this.minimumTime ? this.minimumTime : ast;
+                var minimumTime = null != this.minimumTime ? this.minimumTime : 0;
                 if (!this.isLive) {
                     var duration = this.getDuration();
                     return [ minimumTime, null == duration ? Infinity : duration ];
                 }
-                var plg = this.presentationLiveGap || 0, tsbd = this.timeShiftBufferDepth || 0, max = Date.now() / 1e3 - ast - plg;
+                var ast = this.availabilityStartTime || 0, plg = this.presentationLiveGap || 0, tsbd = this.timeShiftBufferDepth || 0, max = this.getTime() / 1e3 - ast - plg;
                 return [ Math.min(max, Math.max(minimumTime, max - tsbd + 5)), max ];
             }
             /**
@@ -8009,74 +8011,22 @@ object-assign
     /* 103 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
-        // CONCATENATED MODULE: ./src/parsers/texttracks/srt/find_end_of_cue_block.ts
-        /**
- * Copyright 2015 CANAL+ Group
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-        /**
- * Returns the first line that is not apart of the given cue block.
- * The index given can be anywhere in a known cue block.
- *
- * This function is extra-resilient due to observed real-life malformed
- * subtitles.
- * Basically, it allows some deviation from the specification as long as the
- * intent is pretty clear.
- * @param {Array<string>} linified - Whole srt. Line by line.
- * @param {number} startIndex - Index in `linified` of the first line within the
- * block.
- * @returns {number}
- */        function findEndOfCueBlock(linified, startIndex) {
-            // continue incrementing i until either:
-            //   - an empty line
-            //   - the end
-            for (var firstEmptyLineIndex = startIndex + 1; linified[firstEmptyLineIndex]; ) firstEmptyLineIndex++;
-            return firstEmptyLineIndex;
+        // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/operators/mergeMap.js
+                var mergeMap = __webpack_require__(44);
+        // CONCATENATED MODULE: ./node_modules/rxjs/_esm5/internal/util/identity.js
+        /** PURE_IMPORTS_START  PURE_IMPORTS_END */        function identity(x) {
+            return x;
         }
-        // CONCATENATED MODULE: ./src/parsers/texttracks/srt/get_cue_blocks.ts
+        //# sourceMappingURL=identity.js.map
+        // CONCATENATED MODULE: ./node_modules/rxjs/_esm5/internal/operators/mergeAll.js
         /* harmony export (binding) */        
-        /**
- * Copyright 2015 CANAL+ Group
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-        /**
- * Get cue blocks from a srt file.
- * @param {Array.<string>} linified - Whole srt file. Each new element in this
- * array is a new line.
- * @returns {Array.<Array.<string>>}
- */
-        function getCueBlocks(linified) {
-            for (var cueBlocks = [], i = 0; i < linified.length; i++) if (linified[i]) {
-                var endOfCue = findEndOfCueBlock(linified, i), cueBlockCandidate = linified.slice(i, endOfCue);
-                0 < cueBlockCandidate.length && (1 === cueBlockCandidate.length ? 0 <= cueBlockCandidate[0].indexOf("--\x3e") && cueBlocks.push(cueBlockCandidate) : (0 <= cueBlockCandidate[1].indexOf("--\x3e") || 0 <= cueBlockCandidate[0].indexOf("--\x3e")) && cueBlocks.push(cueBlockCandidate)), 
-                i = endOfCue;
-            }
-            return cueBlocks;
+        /** PURE_IMPORTS_START _mergeMap,_util_identity PURE_IMPORTS_END */
+        function mergeAll(concurrent) {
+            return void 0 === concurrent && (concurrent = Number.POSITIVE_INFINITY), Object(mergeMap.a)(identity, concurrent);
         }
+        //# sourceMappingURL=mergeAll.js.map
         /***/        __webpack_require__.d(__webpack_exports__, "a", function() {
-            return getCueBlocks;
+            return mergeAll;
         });
     }, 
     /* 104 */
@@ -8253,27 +8203,6 @@ object-assign
     /* 106 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
-        // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/operators/mergeMap.js
-                var mergeMap = __webpack_require__(44);
-        // CONCATENATED MODULE: ./node_modules/rxjs/_esm5/internal/util/identity.js
-        /** PURE_IMPORTS_START  PURE_IMPORTS_END */        function identity(x) {
-            return x;
-        }
-        //# sourceMappingURL=identity.js.map
-        // CONCATENATED MODULE: ./node_modules/rxjs/_esm5/internal/operators/mergeAll.js
-        /* harmony export (binding) */        
-        /** PURE_IMPORTS_START _mergeMap,_util_identity PURE_IMPORTS_END */
-        function mergeAll(concurrent) {
-            return void 0 === concurrent && (concurrent = Number.POSITIVE_INFINITY), Object(mergeMap.a)(identity, concurrent);
-        }
-        //# sourceMappingURL=mergeAll.js.map
-        /***/        __webpack_require__.d(__webpack_exports__, "a", function() {
-            return mergeAll;
-        });
-    }, 
-    /* 107 */
-    /***/ function(module, __webpack_exports__, __webpack_require__) {
-        "use strict";
         // EXTERNAL MODULE: ./src/parsers/texttracks/ttml/regexps.ts
                 var regexps = __webpack_require__(18);
         // CONCATENATED MODULE: ./src/parsers/texttracks/ttml/time_parsing.ts
@@ -8384,6 +8313,79 @@ object-assign
         }
         /***/        __webpack_require__.d(__webpack_exports__, "a", function() {
             return getTimeDelimiters;
+        });
+    }, 
+    /* 107 */
+    /***/ function(module, __webpack_exports__, __webpack_require__) {
+        "use strict";
+        // CONCATENATED MODULE: ./src/parsers/texttracks/srt/find_end_of_cue_block.ts
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        /**
+ * Returns the first line that is not apart of the given cue block.
+ * The index given can be anywhere in a known cue block.
+ *
+ * This function is extra-resilient due to observed real-life malformed
+ * subtitles.
+ * Basically, it allows some deviation from the specification as long as the
+ * intent is pretty clear.
+ * @param {Array<string>} linified - Whole srt. Line by line.
+ * @param {number} startIndex - Index in `linified` of the first line within the
+ * block.
+ * @returns {number}
+ */        function findEndOfCueBlock(linified, startIndex) {
+            // continue incrementing i until either:
+            //   - an empty line
+            //   - the end
+            for (var firstEmptyLineIndex = startIndex + 1; linified[firstEmptyLineIndex]; ) firstEmptyLineIndex++;
+            return firstEmptyLineIndex;
+        }
+        // CONCATENATED MODULE: ./src/parsers/texttracks/srt/get_cue_blocks.ts
+        /* harmony export (binding) */        
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        /**
+ * Get cue blocks from a srt file.
+ * @param {Array.<string>} linified - Whole srt file. Each new element in this
+ * array is a new line.
+ * @returns {Array.<Array.<string>>}
+ */
+        function getCueBlocks(linified) {
+            for (var cueBlocks = [], i = 0; i < linified.length; i++) if (linified[i]) {
+                var endOfCue = findEndOfCueBlock(linified, i), cueBlockCandidate = linified.slice(i, endOfCue);
+                0 < cueBlockCandidate.length && (1 === cueBlockCandidate.length ? 0 <= cueBlockCandidate[0].indexOf("--\x3e") && cueBlocks.push(cueBlockCandidate) : (0 <= cueBlockCandidate[1].indexOf("--\x3e") || 0 <= cueBlockCandidate[0].indexOf("--\x3e")) && cueBlocks.push(cueBlockCandidate)), 
+                i = endOfCue;
+            }
+            return cueBlocks;
+        }
+        /***/        __webpack_require__.d(__webpack_exports__, "a", function() {
+            return getCueBlocks;
         });
     }, 
     /* 108 */
@@ -9695,7 +9697,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return concatAll;
         });
-        /* harmony import */ var _mergeAll__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(106);
+        /* harmony import */ var _mergeAll__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(103);
         /** PURE_IMPORTS_START _mergeAll PURE_IMPORTS_END */        function concatAll() {
             return Object(_mergeAll__WEBPACK_IMPORTED_MODULE_0__.a)(1);
         }
@@ -10402,7 +10404,7 @@ object-assign
         /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() {
             return parseSRTStringToVTTCues;
         });
-        /* harmony import */ var _compat_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(74), _get_cue_blocks__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(103), _parse_cue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(104);
+        /* harmony import */ var _compat_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(74), _get_cue_blocks__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(107), _parse_cue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(104);
         /* harmony import */        
         /**
  * Copyright 2015 CANAL+ Group
@@ -10586,7 +10588,7 @@ object-assign
         /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() {
             return parseSRTStringToHTML;
         });
-        /* harmony import */ var _get_cue_blocks__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(103), _parse_cue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(104);
+        /* harmony import */ var _get_cue_blocks__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(107), _parse_cue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(104);
         /* harmony import */        
         /**
  * Copyright 2015 CANAL+ Group
@@ -10703,7 +10705,7 @@ object-assign
         /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() {
             return initializeDirectfileContent;
         });
-        /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(39), rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(161), rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(32), rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(44), rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(133), _compat__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(71), _compat__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(117), _errors__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(111), _log__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(0), _create_eme_manager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(98), _events_generators__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(21), _get_stalled_events__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(100), _initial_seek_and_play__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(95), _throw_on_media_error__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(99), _update_playback_rate__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(105);
+        /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(39), rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(161), rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(32), rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(44), rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(133), _compat__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(71), _compat__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(117), _errors__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(111), _log__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(0), _create_eme_manager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(98), _events_generators__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(22), _get_stalled_events__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(100), _initial_seek_and_play__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(95), _throw_on_media_error__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(99), _update_playback_rate__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(105);
         /* harmony import */        
         /**
  * Copyright 2015 CANAL+ Group
@@ -12638,7 +12640,7 @@ object-assign
             }));
         }
         // EXTERNAL MODULE: ./src/core/init/events_generators.ts
-                var events_generators = __webpack_require__(21), DEFAULT_LIVE_GAP = config.a.DEFAULT_LIVE_GAP;
+                var events_generators = __webpack_require__(22), DEFAULT_LIVE_GAP = config.a.DEFAULT_LIVE_GAP;
         // CONCATENATED MODULE: ./src/core/init/get_initial_time.ts
         /**
  * Copyright 2015 CANAL+ Group
@@ -17821,10 +17823,10 @@ object-assign
  * @param {Object} features
  */
         function initializeFeaturesObject() {
-            features.a.emeManager = __webpack_require__(122).default, features.a.imageBuffer = __webpack_require__(158).default, 
+            features.a.emeManager = __webpack_require__(122).default, features.a.imageBuffer = __webpack_require__(159).default, 
             features.a.imageParser = __webpack_require__(142).default, features.a.transports.smooth = __webpack_require__(153).default, 
             features.a.transports.dash = __webpack_require__(152).default, features.a.nativeTextTracksBuffer = __webpack_require__(157).default, 
-            features.a.nativeTextTracksParsers.vtt = __webpack_require__(143).default, features.a.nativeTextTracksParsers.ttml = __webpack_require__(159).default, 
+            features.a.nativeTextTracksParsers.vtt = __webpack_require__(143).default, features.a.nativeTextTracksParsers.ttml = __webpack_require__(158).default, 
             features.a.nativeTextTracksParsers.sami = __webpack_require__(144).default, features.a.nativeTextTracksParsers.srt = __webpack_require__(145).default, 
             features.a.htmlTextTracksBuffer = __webpack_require__(155).default, features.a.htmlTextTracksParsers.sami = __webpack_require__(146).default, 
             features.a.htmlTextTracksParsers.ttml = __webpack_require__(156).default, features.a.htmlTextTracksParsers.srt = __webpack_require__(147).default, 
@@ -17837,7 +17839,7 @@ object-assign
         "use strict";
         __webpack_require__.r(__webpack_exports__);
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/observable/of.js
-        var of = __webpack_require__(39), combineLatest = __webpack_require__(175), filter = __webpack_require__(162), map = __webpack_require__(32), mergeMap = __webpack_require__(44), features = __webpack_require__(10), src_manifest = __webpack_require__(101), utils = __webpack_require__(179), log = __webpack_require__(0), SEGMENT_ID = 408125543, INFO_ID = 357149030, TIMECODESCALE_ID = 2807729, DURATION_ID = 17545;
+        var of = __webpack_require__(39), combineLatest = __webpack_require__(175), filter = __webpack_require__(162), map = __webpack_require__(32), tap = __webpack_require__(121), mergeMap = __webpack_require__(44), features = __webpack_require__(10), src_manifest = __webpack_require__(101), utils = __webpack_require__(179), log = __webpack_require__(0), SEGMENT_ID = 408125543, INFO_ID = 357149030, TIMECODESCALE_ID = 2807729, DURATION_ID = 17545;
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/observable/combineLatest.js
                 /**
  * Find the offsets of the value linked to the given element ID.
@@ -18975,7 +18977,7 @@ object-assign
  * @param {NodeList} mpdChildren
  * @returns {Object}
  */        function parseMPDChildren(mpdChildren) {
-            for (var baseURL = "", locations = [], periods = [], i = 0; i < mpdChildren.length; i++) if (mpdChildren[i].nodeType === Node.ELEMENT_NODE) {
+            for (var baseURL = "", locations = [], periods = [], utcTimings = [], i = 0; i < mpdChildren.length; i++) if (mpdChildren[i].nodeType === Node.ELEMENT_NODE) {
                 var currentNode = mpdChildren[i];
                 switch (currentNode.nodeName) {
                   case "BaseURL":
@@ -18989,12 +18991,18 @@ object-assign
                   case "Period":
                     var period = createPeriodIntermediateRepresentation(currentNode);
                     periods.push(period);
+                    break;
+
+                  case "UTCTiming":
+                    var utcTiming = parseScheme(currentNode);
+                    utcTimings.push(utcTiming);
                 }
             }
             return {
                 baseURL: baseURL,
                 locations: locations,
-                periods: periods
+                periods: periods,
+                utcTimings: utcTimings
             };
         }
         /**
@@ -20252,23 +20260,38 @@ object-assign
                     ressource: xlinkHref
                 });
             }
-            return 0 !== xlinksToLoad.length ? {
+            var utcTimingsToLoad = mpdIR.children.utcTimings.filter(function(utcTiming) {
+                return "urn:mpeg:dash:utc:http-iso:2014" === utcTiming.schemeIdUri;
+            });
+            return 0 !== xlinksToLoad.length || 0 !== utcTimingsToLoad.length ? {
                 type: "needs-ressources",
                 value: {
-                    ressources: xlinksToLoad.map(function(_ref) {
-                        return _ref.ressource;
-                    }),
+                    ressources: [].concat(xlinksToLoad.map(function(_ref) {
+                        return {
+                            type: "xlink",
+                            url: _ref.ressource
+                        };
+                    }), utcTimingsToLoad.map(function(_ref2) {
+                        return {
+                            type: "http-iso",
+                            url: _ref2.value || ""
+                        };
+                    })),
                     continue: function continueParsingMPD(loadedRessources) {
-                        if (loadedRessources.length !== xlinksToLoad.length) throw new Error("DASH parser: wrong number of loaded ressources.");
+                        if (loadedRessources.length !== xlinksToLoad.length + utcTimingsToLoad.length) throw new Error("DASH parser: wrong number of loaded ressources.");
  // Note: It is important to go from the last index to the first index in
                         // the resulting array, as we will potentially add elements to the array
-                                                for (var _i = loadedRessources.length - 1; 0 <= _i; _i--) {
+                                                for (var _i = xlinksToLoad.length - 1; 0 <= _i; _i--) {
                             var _mpdIR$children$perio2, index = xlinksToLoad[_i].index, wrappedData = "<root>" + loadedRessources[_i] + "</root>", dataAsXML = new DOMParser().parseFromString(wrappedData, "text/xml");
                             if (!dataAsXML || 0 === dataAsXML.children.length) throw new Error("DASH parser: Invalid external ressources");
                             for (var periods = dataAsXML.children[0].children, periodsIR = [], j = 0; j < periods.length; j++) periods[j].nodeType === Node.ELEMENT_NODE && periodsIR.push(createPeriodIntermediateRepresentation(periods[j]));
  // replace original "xlinked" periods by the real deal
                                                         // replace original "xlinked" periods by the real deal
                             (_mpdIR$children$perio2 = mpdIR.children.periods).splice.apply(_mpdIR$children$perio2, [ index, 1 ].concat(periodsIR));
+                        }
+                        for (var _j = 0; _j < utcTimingsToLoad.length; _j++) {
+                            var utcTiming = utcTimingsToLoad[_j];
+                            utcTiming.schemeIdUri = "urn:mpeg:dash:utc:direct:2014", utcTiming.value = loadedRessources[xlinksToLoad.length + _j];
                         }
                         return loadExternalRessourcesAndParse(mpdIR, uri);
                     }
@@ -20305,7 +20328,8 @@ object-assign
                 transportType: "dash",
                 isLive: isDynamic,
                 uris: [ uri ].concat(rootChildren.locations),
-                suggestedPresentationDelay: null != rootAttributes.suggestedPresentationDelay ? rootAttributes.suggestedPresentationDelay : config.a.DEFAULT_SUGGESTED_PRESENTATION_DELAY.DASH
+                suggestedPresentationDelay: null != rootAttributes.suggestedPresentationDelay ? rootAttributes.suggestedPresentationDelay : config.a.DEFAULT_SUGGESTED_PRESENTATION_DELAY.DASH,
+                utcTimings: rootChildren.utcTimings
             };
             // -- add optional fields --
             return "static" !== rootAttributes.type && null != rootAttributes.availabilityEndTime && (parsedMPD.availabilityEndTime = rootAttributes.availabilityEndTime), 
@@ -20354,7 +20378,7 @@ object-assign
             var root = document.documentElement;
             if (!root || "MPD" !== root.nodeName) throw new Error("DASH Parser: document root should be MPD");
             return parseMPD(root, uri);
-        }, request = __webpack_require__(22), manifest_loader = __webpack_require__(90);
+        }, request = __webpack_require__(21), manifest_loader = __webpack_require__(90);
         // EXTERNAL MODULE: ./src/utils/request/index.ts + 1 modules
                 /* harmony default export */ var isobmff_timing_infos = 
         // CONCATENATED MODULE: ./src/transports/dash/isobmff_timing_infos.ts
@@ -20713,6 +20737,19 @@ object-assign
                 return e.value.responseData;
             }));
         }
+        function requestHttpIso(url) {
+            return Object(request.a)({
+                url: url,
+                responseType: "text",
+                ignoreProgressEvents: !0
+            }).pipe(Object(filter.a)(function(e) {
+                return "response" === e.type;
+            }), Object(tap.a)(function(a) {
+                return console.log(a);
+            }), Object(map.a)(function(e) {
+                return e.value.responseData;
+            }));
+        }
         /**
  * Returns pipelines used for DASH streaming.
  * @param {Object} options
@@ -20775,7 +20812,7 @@ object-assign
                     },
                     parser: function parser(_ref2) {
                         var response = _ref2.response, loaderURL = _ref2.url, scheduleRequest = _ref2.scheduleRequest, url = null == response.url ? loaderURL : response.url, data = "string" == typeof response.responseData ? new DOMParser().parseFromString(response.responseData, "text/xml") : response.responseData;
-                        return function loadExternalRessources(parserResponse) {
+                        return function loadExternalResources(parserResponse) {
                             if ("done" === parserResponse.type) {
                                 var manifest = new src_manifest.a(parserResponse.value, options);
                                 return Object(of.a)({
@@ -20783,13 +20820,13 @@ object-assign
                                     url: url
                                 });
                             }
-                            var _parserResponse$value = parserResponse.value, ressources = _parserResponse$value.ressources, continueParsing = _parserResponse$value.continue, externalXlinks$ = ressources.map(function(ressourceURL) {
+                            var _parserResponse$value = parserResponse.value, ressources = _parserResponse$value.ressources, continueParsing = _parserResponse$value.continue, externalResources$ = ressources.map(function(resource) {
                                 return scheduleRequest(function() {
-                                    return requestXLink(ressourceURL);
+                                    return "xlink" === resource.type ? requestXLink(resource.url) : requestHttpIso(resource.url);
                                 });
                             });
-                            return Object(combineLatest.a)(externalXlinks$).pipe(Object(mergeMap.a)(function(loadedRessources) {
-                                return loadExternalRessources(continueParsing(loadedRessources));
+                            return Object(combineLatest.a)(externalResources$).pipe(Object(mergeMap.a)(function(loadedResources) {
+                                return loadExternalResources(continueParsing(loadedResources));
                             }));
                         }(dash(data, url));
                     }
@@ -21669,7 +21706,7 @@ object-assign
                 };
                 return Object(check_manifest_ids.a)(manifest), manifest;
             };
-        }, request = __webpack_require__(22), string_from_utf8 = __webpack_require__(92), warn_once = __webpack_require__(36), manifest_loader = __webpack_require__(90), utils = __webpack_require__(179), can_patch_isobmff = __webpack_require__(125), read = __webpack_require__(110), SAMPLING_FREQUENCIES = [ 96e3, 88200, 64e3, 48e3, 44100, 32e3, 24e3, 22050, 16e3, 12e3, 11025, 8e3, 7350 ], boxNamesMem = {};
+        }, request = __webpack_require__(21), string_from_utf8 = __webpack_require__(92), warn_once = __webpack_require__(36), manifest_loader = __webpack_require__(90), utils = __webpack_require__(179), can_patch_isobmff = __webpack_require__(125), read = __webpack_require__(110), SAMPLING_FREQUENCIES = [ 96e3, 88200, 64e3, 48e3, 44100, 32e3, 24e3, 22050, 16e3, 12e3, 11025, 8e3, 7350 ], boxNamesMem = {};
         // CONCATENATED MODULE: ./src/parsers/manifest/smooth/index.ts
         /**
  * Copyright 2015 CANAL+ Group
@@ -23329,7 +23366,7 @@ object-assign
         "use strict";
         __webpack_require__.r(__webpack_exports__);
         // EXTERNAL MODULE: ./node_modules/object-assign/index.js
-        var object_assign = __webpack_require__(9), object_assign_default = /* */ __webpack_require__.n(object_assign), array_find = __webpack_require__(11), get_parameters = __webpack_require__(94), get_parent_elements_by_tag_name = __webpack_require__(63), get_styling = __webpack_require__(28), nodes = __webpack_require__(50), get_time_delimiters = __webpack_require__(107), regexps = __webpack_require__(18), SPAN_LEVEL_ATTRIBUTES = [ "color", "direction", "display", "fontFamily", "fontSize", "fontStyle", "fontWeight", "textDecoration", "textOutline", "unicodeBidi", "visibility", "wrapOption" ];
+        var object_assign = __webpack_require__(9), object_assign_default = /* */ __webpack_require__.n(object_assign), array_find = __webpack_require__(11), get_parameters = __webpack_require__(94), get_parent_elements_by_tag_name = __webpack_require__(63), get_styling = __webpack_require__(28), nodes = __webpack_require__(50), get_time_delimiters = __webpack_require__(106), regexps = __webpack_require__(18), SPAN_LEVEL_ATTRIBUTES = [ "color", "direction", "display", "fontFamily", "fontSize", "fontStyle", "fontWeight", "textDecoration", "textOutline", "unicodeBidi", "visibility", "wrapOption" ];
         /**
  * Translate a color indicated in TTML-style to a CSS-style color.
  * @param {string} color
@@ -23942,71 +23979,8 @@ object-assign
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
         __webpack_require__.r(__webpack_exports__);
-        // EXTERNAL MODULE: ./src/log.ts + 1 modules
-        var log = __webpack_require__(0);
-        // EXTERNAL MODULE: ./src/core/source_buffers/abstract_source_buffer.ts + 1 modules
-                // CONCATENATED MODULE: ./src/core/source_buffers/image/image_source_buffer.ts
-        function _inheritsLoose(subClass, superClass) {
-            subClass.prototype = Object.create(superClass.prototype), (subClass.prototype.constructor = subClass).__proto__ = superClass;
-        }
-        /**
- * Copyright 2015 CANAL+ Group
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-        /**
- * /!\ This file is feature-switchable.
- * It always should be imported through the `features` object.
- */
-        /**
- * Image SourceBuffer implementation.
- * @class ImageSourceBuffer
- */        var image_source_buffer = 
-        /* */
-        function(_AbstractSourceBuffer) {
-            function ImageSourceBuffer() {
-                return _AbstractSourceBuffer.apply(this, arguments) || this;
-            }
-            _inheritsLoose(ImageSourceBuffer, _AbstractSourceBuffer);
-            var _proto = ImageSourceBuffer.prototype;
-            /**
-   * @param {Object} data
-   */            return _proto._append = function _append(data) {
-                log.a.debug("ImageSourceBuffer: appending new data.");
-                var start = data.start, end = data.end, timescale = data.timescale;
-                this.buffered.insert(start / timescale, null == end ? Number.MAX_VALUE : end / timescale);
-            }
-            /**
-   * @param {Number} from
-   * @param {Number} to
-   */ , _proto._remove = function _remove(from, to) {
-                log.a.info("ImageSourceBuffer: ignored image data remove order", from, to);
- // TODO once a better strategy for image cleaning has been set (surely done
-                // when we will work for live thumbnails), restore this implementation.
-                // log.debug("ImageSourceBuffer: removing image data", from, to);
-                // this.buffered.remove(from, to);
-                        }, _proto._abort = function _abort() {
-                log.a.debug("ImageSourceBuffer: aborting image SourceBuffer");
-            }, ImageSourceBuffer;
-        }(__webpack_require__(64).a);
-        /* harmony default export */        __webpack_exports__.default = image_source_buffer;
-    }, 
-    /* 159 */
-    /***/ function(module, __webpack_exports__, __webpack_require__) {
-        "use strict";
-        __webpack_require__.r(__webpack_exports__);
         // EXTERNAL MODULE: ./node_modules/object-assign/index.js
-        var object_assign = __webpack_require__(9), object_assign_default = /* */ __webpack_require__.n(object_assign), make_vtt_cue = __webpack_require__(74), is_vtt_cue = __webpack_require__(113), array_find = __webpack_require__(11), get_parameters = __webpack_require__(94), get_parent_elements_by_tag_name = __webpack_require__(63), get_styling = __webpack_require__(28), get_time_delimiters = __webpack_require__(107), nodes = __webpack_require__(50), regexps = __webpack_require__(18), WANTED_STYLE_ATTRIBUTES = [ "extent", "writingMode", "origin", "align" ], TEXT_ALIGN_TO_LIGN_ALIGN = {
+        var object_assign = __webpack_require__(9), object_assign_default = /* */ __webpack_require__.n(object_assign), make_vtt_cue = __webpack_require__(74), is_vtt_cue = __webpack_require__(113), array_find = __webpack_require__(11), get_parameters = __webpack_require__(94), get_parent_elements_by_tag_name = __webpack_require__(63), get_styling = __webpack_require__(28), get_time_delimiters = __webpack_require__(106), nodes = __webpack_require__(50), regexps = __webpack_require__(18), WANTED_STYLE_ATTRIBUTES = [ "extent", "writingMode", "origin", "align" ], TEXT_ALIGN_TO_LIGN_ALIGN = {
             left: "start",
             center: "center",
             right: "end",
@@ -24184,6 +24158,69 @@ object-assign
  */
         /* harmony default export */        __webpack_exports__.default = parse_ttml_to_vtt;
     }, 
+    /* 159 */
+    /***/ function(module, __webpack_exports__, __webpack_require__) {
+        "use strict";
+        __webpack_require__.r(__webpack_exports__);
+        // EXTERNAL MODULE: ./src/log.ts + 1 modules
+        var log = __webpack_require__(0);
+        // EXTERNAL MODULE: ./src/core/source_buffers/abstract_source_buffer.ts + 1 modules
+                // CONCATENATED MODULE: ./src/core/source_buffers/image/image_source_buffer.ts
+        function _inheritsLoose(subClass, superClass) {
+            subClass.prototype = Object.create(superClass.prototype), (subClass.prototype.constructor = subClass).__proto__ = superClass;
+        }
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        /**
+ * /!\ This file is feature-switchable.
+ * It always should be imported through the `features` object.
+ */
+        /**
+ * Image SourceBuffer implementation.
+ * @class ImageSourceBuffer
+ */        var image_source_buffer = 
+        /* */
+        function(_AbstractSourceBuffer) {
+            function ImageSourceBuffer() {
+                return _AbstractSourceBuffer.apply(this, arguments) || this;
+            }
+            _inheritsLoose(ImageSourceBuffer, _AbstractSourceBuffer);
+            var _proto = ImageSourceBuffer.prototype;
+            /**
+   * @param {Object} data
+   */            return _proto._append = function _append(data) {
+                log.a.debug("ImageSourceBuffer: appending new data.");
+                var start = data.start, end = data.end, timescale = data.timescale;
+                this.buffered.insert(start / timescale, null == end ? Number.MAX_VALUE : end / timescale);
+            }
+            /**
+   * @param {Number} from
+   * @param {Number} to
+   */ , _proto._remove = function _remove(from, to) {
+                log.a.info("ImageSourceBuffer: ignored image data remove order", from, to);
+ // TODO once a better strategy for image cleaning has been set (surely done
+                // when we will work for live thumbnails), restore this implementation.
+                // log.debug("ImageSourceBuffer: removing image data", from, to);
+                // this.buffered.remove(from, to);
+                        }, _proto._abort = function _abort() {
+                log.a.debug("ImageSourceBuffer: aborting image SourceBuffer");
+            }, ImageSourceBuffer;
+        }(__webpack_require__(64).a);
+        /* harmony default export */        __webpack_exports__.default = image_source_buffer;
+    }, 
     /* 160 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
@@ -24242,7 +24279,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return merge;
         });
-        /* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5), _util_isScheduler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(34), _operators_mergeAll__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(106), _fromArray__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(35);
+        /* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5), _util_isScheduler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(34), _operators_mergeAll__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(103), _fromArray__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(35);
         /* harmony import */        
         /** PURE_IMPORTS_START _Observable,_util_isScheduler,_operators_mergeAll,_fromArray PURE_IMPORTS_END */
         function merge() {
