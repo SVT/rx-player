@@ -13,11 +13,6 @@
 
 /dist/*.d.ts
 
-/features
-/minimal
-/experimental
-/types
-
 /localhost.key
 /localhost.crt
 
