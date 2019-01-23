@@ -60,7 +60,7 @@ function clearEMESession(mediaElement) {
  * @returns {Observable}
  */
 export default function EMEManager(mediaElement, keySystemsConfigs) {
-    if (__DEV__) {
+    if (false) {
         keySystemsConfigs.forEach(function (config) { return assertInterface(config, {
             getLicense: "function",
             type: "string",

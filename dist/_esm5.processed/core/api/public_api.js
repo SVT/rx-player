@@ -1591,7 +1591,7 @@ var Player = /** @class */ (function (_super) {
      */
     Player.prototype._priv_onBitrateEstimationChange = function (_a) {
         var type = _a.type, bitrate = _a.bitrate;
-        if (__DEV__) {
+        if (false) {
             assert(type != null);
             assert(bitrate != null);
         }

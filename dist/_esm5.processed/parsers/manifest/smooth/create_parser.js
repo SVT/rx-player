@@ -141,7 +141,7 @@ function createSmoothStreamingParser(parserOptions) {
         var subType = root.getAttribute("Subtype");
         var language = root.getAttribute("Language");
         var baseURL = root.getAttribute("Url") || "";
-        if (__DEV__) {
+        if (false) {
             assert(baseURL !== "");
         }
         var _a = reduceChildren(root, function (res, _name, node) {

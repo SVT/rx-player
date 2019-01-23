@@ -11,8 +11,6 @@
 
 /.scannerwork
 
-/dist/*.d.ts
-
 /localhost.key
 /localhost.crt
 

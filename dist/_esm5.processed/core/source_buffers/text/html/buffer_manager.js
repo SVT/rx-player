@@ -167,7 +167,7 @@ var TextBufferManager = /** @class */ (function () {
      * @param {Number} to
      */
     TextBufferManager.prototype.remove = function (from, _to) {
-        if (__DEV__) {
+        if (false) {
             assert(from >= 0);
             assert(_to >= 0);
             assert(_to > from);

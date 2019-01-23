@@ -159,7 +159,7 @@ export default function (options) {
             var response = _a.response, segment = _a.segment, representation = _a.representation, adaptation = _a.adaptation, manifest = _a.manifest;
             var language = adaptation.language;
             var _b = representation.mimeType, mimeType = _b === void 0 ? "" : _b, _c = representation.codec, codec = _c === void 0 ? "" : _c;
-            if (__DEV__) {
+            if (false) {
                 if (segment.isInit) {
                     assert(response.responseData === null);
                 }
@@ -191,7 +191,7 @@ export default function (options) {
             var _sdData;
             var _sdType;
             if (isMP4) {
-                if (__DEV__) {
+                if (false) {
                     assert(responseData instanceof ArrayBuffer);
                 }
                 parsedResponse = new Uint8Array(responseData);
@@ -201,13 +201,13 @@ export default function (options) {
                 _sdStart = segmentInfos.time;
                 _sdEnd = segmentInfos.duration != null ?
                     segmentInfos.time + segmentInfos.duration : undefined;
-                if (__DEV__) {
+                if (false) {
                     assert(typeof segmentInfos.timescale === "number");
                 }
                 _sdTimescale = segmentInfos.timescale;
             }
             else {
-                if (__DEV__) {
+                if (false) {
                     assert(typeof responseData === "string");
                 }
                 parsedResponse = responseData;

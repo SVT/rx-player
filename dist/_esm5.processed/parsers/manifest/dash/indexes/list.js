@@ -130,7 +130,7 @@ var ListRepresentationIndex = /** @class */ (function () {
      * @returns {Array}
      */
     ListRepresentationIndex.prototype._addSegments = function () {
-        if (__DEV__) {
+        if (false) {
             log.warn("Tried to add Segments to a list RepresentationIndex");
         }
     };

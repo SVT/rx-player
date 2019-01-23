@@ -204,7 +204,7 @@ var SegmentBookkeeper = /** @class */ (function () {
         // other methods of this class, so I decided to not one of those to the
         // inventory by security
         if (end == null) {
-            if (__DEV__) {
+            if (false) {
                 throw new Error("SegmentBookkeeper: ending time of the segment not defined");
             }
             // This leads to excessive re-downloads of segment without an ending time.

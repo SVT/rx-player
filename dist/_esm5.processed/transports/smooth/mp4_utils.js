@@ -69,7 +69,7 @@ function boxName(str) {
  * @returns {Uint8Array} - The entire ISOBMFF box (length+name+content)
  */
 function Atom(name, buff) {
-    if (__DEV__) {
+    if (false) {
         assert(name.length === 4);
     }
     var len = buff.length + 8;
@@ -123,7 +123,7 @@ var atoms = {
      * @returns {Uint8Array}
      */
     avc1encv: function (name, drefIdx, width, height, hRes, vRes, encName, colorDepth, avcc, sinf) {
-        if (__DEV__) {
+        if (false) {
             assert(name === "avc1" || name === "encv", "should be avc1 or encv atom");
             assert(name !== "encv" || sinf instanceof Uint8Array);
         }
@@ -188,7 +188,7 @@ var atoms = {
      * @returns {Uint8Array}
      */
     frma: function (dataFormat) {
-        if (__DEV__) {
+        if (false) {
             assert(dataFormat.length === 4, "wrong data format length");
         }
         return Atom("frma", strToBytes(dataFormat));
@@ -263,7 +263,7 @@ var atoms = {
      * @returns {Uint8Array}
      */
     mp4aenca: function (name, drefIdx, channelsCount, sampleSize, packetSize, sampleRate, esds, sinf) {
-        if (__DEV__) {
+        if (false) {
             assert(name !== "enca" || sinf instanceof Uint8Array);
         }
         return Atom(name, concat(6, itobe2(drefIdx), 8, itobe2(channelsCount), itobe2(sampleSize), 2, itobe2(packetSize), itobe2(sampleRate), 2, esds, (name === "enca") ? sinf || [] : []));
@@ -360,7 +360,7 @@ var atoms = {
      * @returns {Uint8Array}
      */
     schm: function (schemeType, schemeVersion) {
-        if (__DEV__) {
+        if (false) {
             assert(schemeType.length === 4, "wrong scheme type length");
         }
         return Atom("schm", concat(4, strToBytes(schemeType), itobe4(schemeVersion)));
@@ -428,7 +428,7 @@ var atoms = {
      * @returns {Uint8Array}
      */
     tenc: function (algId, ivSize, keyId) {
-        if (__DEV__) {
+        if (false) {
             assert(keyId.length === 32, "wrong default KID length");
         }
         return Atom("tenc", concat(6, [algId, ivSize], hexToBytes(keyId)));
@@ -516,7 +516,7 @@ var reads = {
  */
 function aacesHeader(type, frequency, chans) {
     var freq = SAMPLING_FREQUENCIES.indexOf(frequency);
-    if (__DEV__) {
+    if (false) {
         assert(freq >= 0, "non supported frequency"); // TODO : handle Idx = 15...
     }
     var val;
@@ -749,7 +749,7 @@ export default {
      * @return {Uint8Array}
      */
     patchSegment: function (segment, decodeTime) {
-        if (__DEV__) {
+        if (false) {
             // TODO handle segments with styp/free...
             var name_1 = bytesToStr(segment.subarray(4, 8));
             assert(name_1 === "moof");

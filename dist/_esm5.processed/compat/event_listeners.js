@@ -83,7 +83,7 @@ function compatibleListener(eventNames, prefixes) {
                 return observableFromEvent(element, mem);
             }
             else {
-                if (__DEV__) {
+                if (false) {
                     /* tslint:disable:max-line-length */
                     log.warn("compat: element <" + element.tagName + "> does not support any of these events: " + prefixedEvents.join(", ")
                     /* tslint:enable:max-line-length */

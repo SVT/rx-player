@@ -116,7 +116,7 @@ var TemplateRepresentationIndex = /** @class */ (function () {
      * @returns {Array}
      */
     TemplateRepresentationIndex.prototype._addSegments = function () {
-        if (__DEV__) {
+        if (false) {
             log.warn("Tried to add Segments to a template RepresentationIndex");
         }
     };

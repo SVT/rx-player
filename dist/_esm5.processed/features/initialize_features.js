@@ -21,81 +21,81 @@ import features from "./index";
  */
 export default function initializeFeaturesObject() {
     /* tslint:disable no-var-requires */
-    if (__FEATURES__.EME) {
-        features.emeManager = require(__RELATIVE_PATH__.EME_MANAGER).default;
+    if (false) {
+        features.emeManager = require("../core/eme/index.js").default;
     }
     /* tslint:enable no-var-requires */
     /* tslint:disable no-var-requires */
-    if (__FEATURES__.BIF_PARSER) {
-        features.imageBuffer = require(__RELATIVE_PATH__.IMAGE_BUFFER).default;
-        features.imageParser = require(__RELATIVE_PATH__.BIF_PARSER).default;
+    if (false) {
+        features.imageBuffer = require("../core/source_buffers/image/index.js").default;
+        features.imageParser = require("../parsers/images/bif.js").default;
     }
     /* tslint:enable no-var-requires */
     // Feature switching the Native TextTrack implementation
-    var HAS_NATIVE_MODE = __FEATURES__.NATIVE_VTT ||
-        __FEATURES__.NATIVE_SAMI ||
-        __FEATURES__.NATIVE_TTML ||
-        __FEATURES__.NATIVE_SRT;
+    var HAS_NATIVE_MODE = false ||
+        false ||
+        false ||
+        false;
     /* tslint:disable no-var-requires */
-    if (__FEATURES__.SMOOTH) {
-        features.transports.smooth = require(__RELATIVE_PATH__.SMOOTH).default;
+    if (false) {
+        features.transports.smooth = require("../transports/smooth/index.js").default;
     }
-    if (__FEATURES__.DASH) {
-        features.transports.dash = require(__RELATIVE_PATH__.DASH).default;
+    if (false) {
+        features.transports.dash = require("../transports/dash/index.js").default;
     }
     /* tslint:enable no-var-requires */
     /* tslint:disable no-var-requires */
     if (HAS_NATIVE_MODE) {
         features.nativeTextTracksBuffer =
-            require(__RELATIVE_PATH__.NATIVE_TEXT_BUFFER).default;
-        if (__FEATURES__.NATIVE_VTT) {
+            require("../core/source_buffers/text/native/index.js").default;
+        if (false) {
             features.nativeTextTracksParsers.vtt =
-                require(__RELATIVE_PATH__.NATIVE_VTT).default;
+                require("../parsers/texttracks/webvtt/native.js").default;
         }
-        if (__FEATURES__.NATIVE_TTML) {
+        if (false) {
             features.nativeTextTracksParsers.ttml =
-                require(__RELATIVE_PATH__.NATIVE_TTML).default;
+                require("../parsers/texttracks/ttml/native/index.js").default;
         }
-        if (__FEATURES__.NATIVE_SAMI) {
+        if (false) {
             features.nativeTextTracksParsers.sami =
-                require(__RELATIVE_PATH__.NATIVE_SAMI).default;
+                require("../parsers/texttracks/sami/native.js").default;
         }
-        if (__FEATURES__.NATIVE_SRT) {
+        if (false) {
             features.nativeTextTracksParsers.srt =
-                require(__RELATIVE_PATH__.NATIVE_SRT).default;
+                require("../parsers/texttracks/srt/native.js").default;
         }
     }
     /* tslint:enable no-var-requires */
     // Feature switching the HTML TextTrack implementation
-    var HAS_HTML_MODE = __FEATURES__.HTML_VTT ||
-        __FEATURES__.HTML_SAMI ||
-        __FEATURES__.HTML_TTML ||
-        __FEATURES__.HTML_SRT;
+    var HAS_HTML_MODE = false ||
+        false ||
+        false ||
+        false;
     /* tslint:disable no-var-requires */
     if (HAS_HTML_MODE) {
         features.htmlTextTracksBuffer =
-            require(__RELATIVE_PATH__.HTML_TEXT_BUFFER).default;
-        if (__FEATURES__.HTML_SAMI) {
+            require("../core/source_buffers/text/html/index.js").default;
+        if (false) {
             features.htmlTextTracksParsers.sami =
-                require(__RELATIVE_PATH__.HTML_SAMI).default;
+                require("../parsers/texttracks/sami/html.js").default;
         }
-        if (__FEATURES__.HTML_TTML) {
+        if (false) {
             features.htmlTextTracksParsers.ttml =
-                require(__RELATIVE_PATH__.HTML_TTML).default;
+                require("../parsers/texttracks/ttml/html/index.js").default;
         }
-        if (__FEATURES__.HTML_SRT) {
+        if (false) {
             features.htmlTextTracksParsers.srt =
-                require(__RELATIVE_PATH__.HTML_SRT).default;
+                require("../parsers/texttracks/srt/html.js").default;
         }
-        if (__FEATURES__.HTML_VTT) {
+        if (false) {
             features.htmlTextTracksParsers.vtt =
-                require(__RELATIVE_PATH__.HTML_VTT).default;
+                require("../parsers/texttracks/webvtt/html/index.js").default;
         }
         /* tslint:enable no-var-requires */
     }
     /* tslint:disable no-var-requires */
-    if (__FEATURES__.DIRECTFILE) {
-        features.directfile = require(__RELATIVE_PATH__.DIRECTFILE).default;
+    if (false) {
+        features.directfile = require("../core/init/directfile.js").default;
     }
     /* tslint:enable no-var-requires */
 }
