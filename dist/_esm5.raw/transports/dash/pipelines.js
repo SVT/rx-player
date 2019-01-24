@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { combineLatest as observableCombineLatest, of as observableOf, } from "rxjs";
-import { filter, map, mergeMap, tap } from "rxjs/operators";
+import { filter, map, mergeMap, } from "rxjs/operators";
 import features from "../../features";
 import Manifest from "../../manifest";
 import { getMDHDTimescale, getSegmentsFromSidx, } from "../../parsers/containers/isobmff";
@@ -42,7 +42,7 @@ function requestHttpIso(url) {
         url: url,
         responseType: "text",
         ignoreProgressEvents: true,
-    }).pipe(filter(function (e) { return e.type === "response"; }), tap(function (a) { return console.log(a); }), map(function (e) { return e.value.responseData; }));
+    }).pipe(filter(function (e) { return e.type === "response"; }), map(function (e) { return e.value.responseData; }));
 }
 /**
  * Returns pipelines used for DASH streaming.

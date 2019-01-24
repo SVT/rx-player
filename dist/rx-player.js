@@ -17839,7 +17839,7 @@ object-assign
         "use strict";
         __webpack_require__.r(__webpack_exports__);
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/observable/of.js
-        var of = __webpack_require__(39), combineLatest = __webpack_require__(175), filter = __webpack_require__(162), map = __webpack_require__(32), tap = __webpack_require__(121), mergeMap = __webpack_require__(44), features = __webpack_require__(10), src_manifest = __webpack_require__(101), utils = __webpack_require__(179), log = __webpack_require__(0), SEGMENT_ID = 408125543, INFO_ID = 357149030, TIMECODESCALE_ID = 2807729, DURATION_ID = 17545;
+        var of = __webpack_require__(39), combineLatest = __webpack_require__(175), filter = __webpack_require__(162), map = __webpack_require__(32), mergeMap = __webpack_require__(44), features = __webpack_require__(10), src_manifest = __webpack_require__(101), utils = __webpack_require__(179), log = __webpack_require__(0), SEGMENT_ID = 408125543, INFO_ID = 357149030, TIMECODESCALE_ID = 2807729, DURATION_ID = 17545;
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/observable/combineLatest.js
                 /**
  * Find the offsets of the value linked to the given element ID.
@@ -18040,8 +18040,8 @@ object-assign
             if (0 === manifest.periods.length) throw new Error("DASH Parser: no period available for a live content");
             var lastPeriodAdaptations = manifest.periods[manifest.periods.length - 1].adaptations, firstAdaptationsFromLastPeriod = lastPeriodAdaptations.video || lastPeriodAdaptations.audio;
             if (!firstAdaptationsFromLastPeriod || !firstAdaptationsFromLastPeriod.length) throw new Error("DASH Parser: Can't find first adaptation from last period");
-            var lastRef = getLastLiveTimeReference(firstAdaptationsFromLastPeriod[0]), ast = manifest.availabilityStartTime || 0;
-            return null != lastRef ? Date.now() / 1e3 - (lastRef + ast) : 10;
+            var lastRef = getLastLiveTimeReference(firstAdaptationsFromLastPeriod[0]), ast = manifest.availabilityStartTime || 0, now = manifest.utcTimings && 0 < manifest.utcTimings.length && manifest.utcTimings[0].value ? Date.parse(manifest.utcTimings[0].value) : Date.now();
+            return null != lastRef ? now / 1e3 - (lastRef + ast) : 10;
         }
         // EXTERNAL MODULE: ./src/utils/assert.ts + 1 modules
                 var assert = __webpack_require__(13), iso8601Duration = /^P(([\d.]*)Y)?(([\d.]*)M)?(([\d.]*)D)?T?(([\d.]*)H)?(([\d.]*)M)?(([\d.]*)S)?/, rangeRe = /([0-9]+)-([0-9]+)/;
@@ -20744,8 +20744,6 @@ object-assign
                 ignoreProgressEvents: !0
             }).pipe(Object(filter.a)(function(e) {
                 return "response" === e.type;
-            }), Object(tap.a)(function(a) {
-                return console.log(a);
             }), Object(map.a)(function(e) {
                 return e.value.responseData;
             }));
