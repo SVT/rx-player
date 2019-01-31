@@ -51,10 +51,11 @@ const karmaConf = {
 
   files: [
     path.resolve(__dirname, "./index.js"),
+    //path.resolve(__dirname, "./scenarios/dash_live_no_timeline.js"),
   ],
 
   client: {
-    captureConsole: false,
+    captureConsole: true,
     mocha: {
       reporter: "html",
     },
