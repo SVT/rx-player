@@ -20,88 +20,88 @@ const URLs = [
   // Audio initialization segment
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/A48/init.mp4",
-    data: require("raw-loader!./media/A48/init.mp4"),
+    data: require("arraybuffer-loader!./media/A48/init.mp4"),
     contentType: "audio/mp4",
   },
 
   // Audio segments
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/A48/774430877.m4s",
-    data: require("raw-loader!./media/A48/774430877.m4s"),
+    data: require("arraybuffer-loader!./media/A48/774430877.m4s"),
     contentType: "audio/mp4",
   },
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/A48/774430878.m4s",
-    data: require("raw-loader!./media/A48/774430878.m4s"),
+    data: require("arraybuffer-loader!./media/A48/774430878.m4s"),
     contentType: "audio/mp4",
   },
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/A48/774430879.m4s",
-    data: require("raw-loader!./media/A48/774430879.m4s"),
+    data: require("arraybuffer-loader!./media/A48/774430879.m4s"),
     contentType: "audio/mp4",
   },
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/A48/774430880.m4s",
-    data: require("raw-loader!./media/A48/774430880.m4s"),
+    data: require("arraybuffer-loader!./media/A48/774430880.m4s"),
     contentType: "audio/mp4",
   },
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/A48/774430881.m4s",
-    data: require("raw-loader!./media/A48/774430881.m4s"),
+    data: require("arraybuffer-loader!./media/A48/774430881.m4s"),
     contentType: "audio/mp4",
   },
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/A48/774430882.m4s",
-    data: require("raw-loader!./media/A48/774430882.m4s"),
+    data: require("arraybuffer-loader!./media/A48/774430882.m4s"),
     contentType: "audio/mp4",
   },
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/A48/774430883.m4s",
-    data: require("raw-loader!./media/A48/774430883.m4s"),
+    data: require("arraybuffer-loader!./media/A48/774430883.m4s"),
     contentType: "audio/mp4",
   },
 
   // Video initialization segment
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/V300/init.mp4",
-    data: require("raw-loader!./media/V300/init.mp4"),
+    data: require("arraybuffer-loader!./media/V300/init.mp4"),
     contentType: "video/mp4",
   },
 
   // Video Segments
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/V300/774430877.m4s",
-    data: require("raw-loader!./media/V300/774430877.m4s"),
+    data: require("arraybuffer-loader!./media/V300/774430877.m4s"),
     contentType: "video/mp4",
   },
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/V300/774430878.m4s",
-    data: require("raw-loader!./media/V300/774430878.m4s"),
+    data: require("arraybuffer-loader!./media/V300/774430878.m4s"),
     contentType: "video/mp4",
   },
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/V300/774430879.m4s",
-    data: require("raw-loader!./media/V300/774430879.m4s"),
+    data: require("arraybuffer-loader!./media/V300/774430879.m4s"),
     contentType: "video/mp4",
   },
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/V300/774430880.m4s",
-    data: require("raw-loader!./media/V300/774430880.m4s"),
+    data: require("arraybuffer-loader!./media/V300/774430880.m4s"),
     contentType: "video/mp4",
   },
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/V300/774430881.m4s",
-    data: require("raw-loader!./media/V300/774430881.m4s"),
+    data: require("arraybuffer-loader!./media/V300/774430881.m4s"),
     contentType: "video/mp4",
   },
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/V300/774430882.m4s",
-    data: require("raw-loader!./media/V300/774430882.m4s"),
+    data: require("arraybuffer-loader!./media/V300/774430882.m4s"),
     contentType: "video/mp4",
   },
   {
     url: "http://vm2.dashif.org/livesim/start_1800/testpic_2s/V300/774430883.m4s",
-    data: require("raw-loader!./media/V300/774430883.m4s"),
+    data: require("arraybuffer-loader!./media/V300/774430883.m4s"),
     contentType: "video/mp4",
   },
 ];

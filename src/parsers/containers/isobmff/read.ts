@@ -32,7 +32,7 @@ function getBox(buf : Uint8Array, boxName : number) : Uint8Array|null {
   while (i + 8 < l) {
     size = be4toi(buf, i);
     name = be4toi(buf, i + 4);
-    assert(size > 0, "out of range size");
+    assert(size > 0, "out of rangezz size");
     if (name === boxName) {
       break;
     } else {

@@ -36,6 +36,12 @@ function waitForLoadedStateAfterLoadVideo(player) {
  */
 export default function waitForState(player, state, whitelist) {
   return new Promise((resolve, reject) => {
+    if (state === player.getPlayerState()) {
+      resolve();
+
+      return;
+    }
+
     function onPlayerStateChange(state) {
       if (state === state) {
         player.removeEventListener("playerStateChange", onPlayerStateChange);
