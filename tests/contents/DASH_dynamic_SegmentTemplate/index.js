@@ -111,7 +111,7 @@ const manifestInfos = {
   transport: "dash",
   isLive: true,
   timeShiftBufferDepth: 300,
-  availabilityStartTime: 0,
+  availabilityStartTime: 1800,
   periods: [
     {
       adaptations: {
