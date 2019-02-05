@@ -5,7 +5,7 @@
 
 const Manifest_URL = {
   url: "https://svt-event-36-b.akamaized.net/world/1391930-035A/manifest.mpd",
-  data: require("raw-loader!./media/manifest.mpd"),
+  data: require("raw-loader!./media/Manifest.mpd"),
   contentType: "application/dash+xml",
 };
 
@@ -115,6 +115,7 @@ const URLs = [
 const manifestInfos = {
   url: "https://svt-event-36-b.akamaized.net/world/1391930-035A/manifest.mpd",
   transport: "dash",
+  availabilityStartTime: 1549292411.358
 };
 
 export {

@@ -16,9 +16,9 @@ import {
 //   launchTestsForContent(URLs, manifestInfos);
 // });
 
-RxPlayer.LogLevel = "DEBUG";
+// RxPlayer.LogLevel = "DEBUG";
 
-const NOW = 1549292411358;
+const NOW = 1549292427758;
 
 describe("DASH live content (SegmentTemplate)", function () {
   let player;
@@ -44,7 +44,7 @@ describe("DASH live content (SegmentTemplate)", function () {
     fakeClock = null;
   });
 
-  xit("should fetch and parse the manifest", async function () {
+  it("should fetch and parse the manifest", async function () {
     player.loadVideo({
       url: manifestInfos.url,
       transport: manifestInfos.transport
@@ -60,8 +60,7 @@ describe("DASH live content (SegmentTemplate)", function () {
     expect(manifest.transport)
       .to.equal(manifestInfos.transport);
     expect(manifest.availabilityStartTime)
-      .to.equal(31537800);
-      //.to.equal(manifestInfos.availabilityStartTime);
+      .to.equal(manifestInfos.availabilityStartTime);
   });
 
   it("should begin playback on play", async function () {
@@ -71,7 +70,6 @@ describe("DASH live content (SegmentTemplate)", function () {
     });
 
     await sleep(200);
-    console.log(fakeServer.requests.map(x => x.url));
 
     const manifest = player.getManifest();
     expect(manifest).not.to.equal(null);
