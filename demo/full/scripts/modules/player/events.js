@@ -20,7 +20,7 @@ const POSITION_UPDATES_INTERVAL = 100;
  */
 const linkPlayerEventsToState = (player, state, $destroy) => {
   const fromPlayerEvent = (event) =>
-    Observable.create(obs => {
+    new Observable(obs => {
       const func = (payload) => obs.next(payload);
       player.addEventListener(event, func);
 
@@ -99,6 +99,9 @@ const linkPlayerEventsToState = (player, state, $destroy) => {
       stateUpdates.availableLanguages = [];
       stateUpdates.availableSubtitles = [];
       stateUpdates.images = [];
+      stateUpdates.subtitle = null;
+      stateUpdates.language = null;
+      stateUpdates.videoTrack = null;
       stateUpdates.currentTime = undefined;
       stateUpdates.wallClockDiff = undefined;
       stateUpdates.bufferGap = undefined;

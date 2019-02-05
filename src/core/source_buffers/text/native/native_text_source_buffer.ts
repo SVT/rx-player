@@ -19,6 +19,7 @@ import {
   ICompatTextTrack,
   ICustomSourceBuffer,
 } from "../../../../compat";
+import removeCue from "../../../../compat/remove_cue";
 import log from "../../../../log";
 import AbstractSourceBuffer from "../../abstract_source_buffer";
 import parseTextTrackToCues from "./parsers";
@@ -125,11 +126,13 @@ export default class NativeTextSourceBuffer
     log.debug("NTSB: Removing native text track data", from, to);
     const track = this._track;
     const cues = track.cues;
-    for (let i = cues.length - 1; i >= 0; i--) {
-      const cue = cues[i];
-      const { startTime, endTime } = cue;
-      if (startTime >= from && startTime <= to && endTime <= to) {
-        track.removeCue(cue);
+    if (cues != null) {
+      for (let i = cues.length - 1; i >= 0; i--) {
+        const cue = cues[i];
+        const { startTime, endTime } = cue;
+        if (startTime >= from && startTime <= to && endTime <= to) {
+          removeCue(track, cue);
+        }
       }
     }
     this.buffered.remove(from, to);
@@ -137,6 +140,7 @@ export default class NativeTextSourceBuffer
 
   _abort() : void {
     log.debug("NTSB: Aborting native text track SourceBuffer");
+    this._remove(0, Infinity);
     const {
       _trackElement,
       _videoElement,
