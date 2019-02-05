@@ -42,12 +42,12 @@ export default function waitForState(player, state, whitelist) {
       return;
     }
 
-    function onPlayerStateChange(state) {
-      if (state === state) {
+    function onPlayerStateChange(nextState) {
+      if (nextState === state) {
         player.removeEventListener("playerStateChange", onPlayerStateChange);
         resolve();
-      } else if (whitelist && !whitelist.includes(state)) {
-        reject("invalid state: " + state);
+      } else if (whitelist && !whitelist.includes(nextState)) {
+        reject("invalid state: " + nextState);
       }
     }
     player.addEventListener("playerStateChange", onPlayerStateChange);

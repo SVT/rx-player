@@ -431,6 +431,7 @@ export default class Manifest extends EventEmitter<"manifestUpdate", null> {
     const ast = this.availabilityStartTime || 0;
     const plg = this.presentationLiveGap || 0;
     const now = this.getTime() / 1000;
+
     return now - ast - plg;
   }
 

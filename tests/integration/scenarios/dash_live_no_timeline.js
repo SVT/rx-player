@@ -99,19 +99,50 @@ describe("DASH live content (SegmentTemplate)", function () {
     expect(player.getVideoPlayedTime()).to.be.above(0);
   });
 
-  debugit('should stay in loaded state if period is not within initial time', async function () {
+  it('should stay in loaded state if period is not within initial time', async function () {
     fakeClock.setSystemTime(TIME_JUST_WHEN_AVAILABLE);
 
     player.loadVideo({
       transport: manifestInfos.transport,
       url: manifestInfos.url,
+      startAt: {
+        position: 0
+      }
     });
 
     await sleep(200);
-
     expect(player.getManifest()).not.to.equal(null);
 
     await waitForState(player, "LOADING");
+    await sleep(200);
+    expect(player.getPlayerState()).to.equal("LOADING");
+  });
+
+  debugit('should start playing when entering first period', async function () {
+    /*
+     * This time will make initial time to be ~= -0.348,
+     * thus forcing the media source loader to wait for
+     * 348ms because the first period starts at 0.
+     */
+    fakeClock.setSystemTime(TIME_JUST_WHEN_AVAILABLE + 9000);
+
+    player.loadVideo({
+      transport: manifestInfos.transport,
+      url: manifestInfos.url,
+      startAt: {
+        position: 0
+      }
+    });
+
+    await waitForLoadedStateAfterLoadVideo(player);
+
+    player.play();
+    await sleep(350);
+
+    expect(player.getPosition()).to.be.above(0);
+    expect(player.getPosition()).to.be.below(0.25);
+    expect(player.getVideoLoadedTime()).to.be.above(0);
+    expect(player.getVideoPlayedTime()).to.be.above(0);
   });
 });
 

@@ -131,7 +131,7 @@ function loadExternalRessourcesAndParse(
           const utcTiming = utcTimingsToLoad[j];
           utcTiming.schemeIdUri = 'urn:mpeg:dash:utc:direct:2014';
 
-          utcTiming.value = loadedRessources[xlinksToLoad.length + j];
+          utcTiming.value = loadedRessources[xlinksToLoad.length + j].trim();
         }
 
         return loadExternalRessourcesAndParse(mpdIR, uri);
