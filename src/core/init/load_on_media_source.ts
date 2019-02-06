@@ -90,10 +90,10 @@ export type IMediaSourceLoaderEvent =
   IWarningEvent |
   IBufferOrchestratorEvent;
 
-function waitForInitialPeriod(manifest: Manifest, initialTime: number) : Observable<Period> {
+function waitForInitialPeriod(manifest: Manifest, initialTime: number) : Observable<{initialPeriod: Period, initialTime: number}> {
     const initialPeriod = manifest.getPeriodForTime(initialTime);
     if (initialPeriod != null) {
-      return observableOf(initialPeriod);
+      return observableOf({initialPeriod, initialTime});
     }
 
     // If first period has not started yet.
@@ -102,7 +102,7 @@ function waitForInitialPeriod(manifest: Manifest, initialTime: number) : Observa
       const firstPeriod = manifest.periods[0];
       const waitTime = (firstPeriod.start - initialTime) * 1000;
       log.info(`Wait for ${waitTime}`);
-      return observableTimer(waitTime).pipe(mapTo(firstPeriod));
+      return observableTimer(waitTime).pipe(mapTo({ initialPeriod: firstPeriod, initialTime: 0 }));
     }
 
     throw new MediaError("MEDIA_STARTING_TIME_NOT_FOUND", null, true);
@@ -139,7 +139,7 @@ export default function createMediaSourceLoader({
     initialTime : number,
     autoPlay : boolean
   ) {
-    const setup = (initialPeriod: Period) => {
+    const setup = (initialPeriod: Period, initialTime: number) => {
       // TODO Update the duration if it evolves?
       const duration = manifest.getDuration();
       setDurationToMediaSource(mediaSource, duration == null ?  Infinity : duration);
@@ -233,8 +233,8 @@ export default function createMediaSourceLoader({
     const initialPeriod$ = waitForInitialPeriod(manifest, initialTime);
 
     return initialPeriod$.pipe(
-      tap((initialPeriod) => log.info(`GOT FIRST PERIOD: start=${initialPeriod.start}`)),
-      switchMap(initialPeriod => setup(initialPeriod))
+      tap(({initialPeriod, initialTime}) => log.info(`GOT FIRST PERIOD: start=${initialPeriod.start} initialTime=${initialTime}`)),
+      switchMap(({initialPeriod, initialTime}) => setup(initialPeriod, initialTime))
     );
   };
 }
