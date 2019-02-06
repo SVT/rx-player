@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IStyleElement } from "./parse_style_block";
+import { IStyleElements } from "./parse_style_block";
 /**
  * @param {string} text
  * @param {Array.<Object>} styleElements
  * @returns {Array.<HTMLElement>}
  */
-export default function convertPayloadToHTML(text: string, styleElements: IStyleElement[]): HTMLElement[];
+export default function convertPayloadToHTML(text: string, styleElements: IStyleElements): HTMLElement[];

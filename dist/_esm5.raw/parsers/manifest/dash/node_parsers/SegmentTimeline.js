@@ -26,9 +26,7 @@ export default function parseSegmentTimeline(root) {
             var currentElement = timelineChildren[i];
             if (currentElement.nodeName === "S") {
                 var s = parseS(currentElement);
-                if (s) {
-                    parsedS.push(s);
-                }
+                parsedS.push(s);
             }
         }
     }

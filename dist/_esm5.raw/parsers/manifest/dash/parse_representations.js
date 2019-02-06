@@ -161,18 +161,6 @@ export default function parseRepresentations(representationsIR, adaptation, adap
             parsedRepresentation.width =
                 adaptation.attributes.width;
         }
-        if (adaptation.children.contentProtections) {
-            var contentProtections = [];
-            for (var k = 0; k < adaptation.children.contentProtections.length; k++) {
-                var protection = adaptation.children.contentProtections[k];
-                if (protection.keyId != null) {
-                    contentProtections.push({ keyId: protection.keyId });
-                }
-            }
-            if (contentProtections.length) {
-                parsedRepresentation.contentProtections = contentProtections;
-            }
-        }
         return parsedRepresentation;
     });
 }

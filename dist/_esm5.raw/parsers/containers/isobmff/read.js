@@ -16,12 +16,41 @@
 import assert from "../../../utils/assert";
 import { be4toi } from "../../../utils/byte_parsing";
 /**
+ * Returns the content of a box based on its name.
+ * `null` if not found.
+ * /!\ does not work with UUID boxes
  * @param {Uint8Array} buf - the isobmff structure
- * @param {Number} boxName - the 'name' of the box (e.g. 'sidx' or 'moov'),
- * hexa encoded
+ * @param {Number} boxName - the 4-letter 'name' of the box (e.g. 'sidx' or
+ * 'moov'), hexa encoded
+ * @returns {UInt8Array|null}
+ */
+function getBoxContent(buf, boxName) {
+    var offsets = getBoxOffsets(buf, boxName);
+    return offsets != null ? buf.subarray(offsets[0] + 8, offsets[1]) : null;
+}
+/**
+ * Returns an ISOBMFF box based on its name.
+ * `null` if not found.
+ * /!\ does not work with UUID boxes
+ * @param {Uint8Array} buf - the isobmff structure
+ * @param {Number} boxName - the 4-letter 'name' of the box (e.g. 'sidx' or
+ * 'moov'), hexa encoded
  * @returns {UInt8Array|null}
  */
 function getBox(buf, boxName) {
+    var offsets = getBoxOffsets(buf, boxName);
+    return offsets != null ? buf.subarray(offsets[0], offsets[1]) : null;
+}
+/**
+ * Returns start and end offset for a given box.
+ * `null` if not found.
+ * /!\ does not work with UUID boxes
+ * @param {Uint8Array} buf - the isobmff structure
+ * @param {Number} boxName - the 4-letter 'name' of the box (e.g. 'sidx' or
+ * 'moov'), hexa encoded
+ * @returns {Array.<number>|null}
+ */
+function getBoxOffsets(buf, boxName) {
     var l = buf.length;
     var i = 0;
     var name;
@@ -29,7 +58,7 @@ function getBox(buf, boxName) {
     while (i + 8 < l) {
         size = be4toi(buf, i);
         name = be4toi(buf, i + 4);
-        assert(size > 0, "out of range size");
+        assert(size > 0, "out of rangezz size");
         if (name === boxName) {
             break;
         }
@@ -38,7 +67,7 @@ function getBox(buf, boxName) {
         }
     }
     if (i < l) {
-        return buf.subarray(i + 8, i + size);
+        return [i, i + size];
     }
     else {
         return null;
@@ -51,11 +80,11 @@ function getBox(buf, boxName) {
  * @returns {Uint8Array|null}
  */
 function getTRAF(buffer) {
-    var moof = getBox(buffer, 0x6d6f6f66 /* moof */);
+    var moof = getBoxContent(buffer, 0x6d6f6f66 /* moof */);
     if (!moof) {
         return null;
     }
-    return getBox(moof, 0x74726166 /* traf */);
+    return getBoxContent(moof, 0x74726166 /* traf */);
 }
 /**
  * Returns MDAT Box from the whole ISOBMFF File.
@@ -64,7 +93,7 @@ function getTRAF(buffer) {
  * @returns {Uint8Array|null}
  */
 function getMDAT(buf) {
-    return getBox(buf, 0x6D646174 /* "mdat" */);
+    return getBoxContent(buf, 0x6D646174 /* "mdat" */);
 }
 /**
  * Returns MDIA Box from the whole ISOBMFF File.
@@ -73,14 +102,14 @@ function getMDAT(buf) {
  * @returns {Uint8Array|null}
  */
 function getMDIA(buf) {
-    var moov = getBox(buf, 0x6d6f6f76 /* moov */);
+    var moov = getBoxContent(buf, 0x6d6f6f76 /* moov */);
     if (!moov) {
         return null;
     }
-    var trak = getBox(moov, 0x7472616b /* "trak" */);
+    var trak = getBoxContent(moov, 0x7472616b /* "trak" */);
     if (!trak) {
         return null;
     }
-    return getBox(trak, 0x6d646961 /* "mdia" */);
+    return getBoxContent(trak, 0x6d646961 /* "mdia" */);
 }
-export { getTRAF, getMDAT, getMDIA, };
+export { getBox, getBoxContent, getBoxOffsets, getTRAF, getMDAT, getMDIA, };

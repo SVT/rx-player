@@ -2305,6 +2305,41 @@ object-assign
     /* 19 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
+        /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "b", function() {
+            return isIE11;
+        }), 
+        /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() {
+            return isIEOrEdge;
+        }), 
+        /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() {
+            return isFirefox;
+        }), 
+        /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() {
+            return isSamsungBrowser;
+        });
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        // true on IE11
+        // false on Edge and other IEs/browsers.
+        var isIE11 = !!window.MSInputMethodContext && !!document.documentMode, isIEOrEdge = "Microsoft Internet Explorer" === navigator.appName || "Netscape" === navigator.appName && /(Trident|Edge)\//.test(navigator.userAgent), isFirefox = -1 !== navigator.userAgent.toLowerCase().indexOf("firefox"), isSamsungBrowser = /SamsungBrowser/.test(navigator.userAgent);
+ // true for IE / Edge
+        }, 
+    /* 20 */
+    /***/ function(module, __webpack_exports__, __webpack_require__) {
+        "use strict";
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return HTMLElement_;
         }), 
@@ -2344,7 +2379,7 @@ object-assign
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */    }, 
-    /* 20 */
+    /* 21 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "b", function() {
@@ -2416,21 +2451,89 @@ object-assign
             MEDIA_KEYS_NOT_SUPPORTED: "MEDIA_KEYS_NOT_SUPPORTED"
         };
     }, 
-    /* 21 */
+    /* 22 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
-        /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "b", function() {
-            return isIE11;
-        }), 
-        /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() {
-            return isIEOrEdge;
-        }), 
-        /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() {
-            return isFirefox;
-        }), 
-        /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() {
-            return isSamsungBrowser;
-        });
+        // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/Observable.js + 3 modules
+                var Observable = __webpack_require__(5), config = __webpack_require__(2), error_codes = __webpack_require__(21), request_error = __webpack_require__(177), DEFAULT_REQUEST_TIMEOUT = config.a.DEFAULT_REQUEST_TIMEOUT;
+        // EXTERNAL MODULE: ./src/config.ts
+                /**
+ * @param {string} data
+ * @returns {Object|null}
+ */
+        function toJSONForIE(data) {
+            try {
+                return JSON.parse(data);
+            } catch (e) {
+                return null;
+            }
+        }
+        /* harmony default export */ var xhr_request = function request(options) {
+            var requestOptions = {
+                url: options.url,
+                headers: options.headers,
+                responseType: null == options.responseType ? "json" : options.responseType,
+                timeout: null == options.timeout ? DEFAULT_REQUEST_TIMEOUT : options.timeout
+            };
+            return new Observable.a(function(obs) {
+                var url = requestOptions.url, headers = requestOptions.headers, responseType = requestOptions.responseType, timeout = requestOptions.timeout, xhr = new XMLHttpRequest();
+                if (xhr.open("GET", url, !0), 0 <= timeout && (xhr.timeout = timeout), xhr.responseType = responseType, 
+                "document" === xhr.responseType && xhr.overrideMimeType("text/xml"), headers) {
+                    var _headers = headers;
+                    for (var key in _headers) _headers.hasOwnProperty(key) && xhr.setRequestHeader(key, _headers[key]);
+                }
+                var sendingTime = performance.now();
+                return xhr.onerror = function onXHRError() {
+                    var errorCode = error_codes.c.ERROR_EVENT;
+                    obs.error(new request_error.a(xhr, url, errorCode));
+                }, xhr.ontimeout = function onXHRTimeout() {
+                    var errorCode = error_codes.c.TIMEOUT;
+                    obs.error(new request_error.a(xhr, url, errorCode));
+                }, options.ignoreProgressEvents || (xhr.onprogress = function onXHRProgress(event) {
+                    var currentTime = performance.now();
+                    obs.next({
+                        type: "progress",
+                        value: {
+                            url: url,
+                            duration: currentTime - sendingTime,
+                            sendingTime: sendingTime,
+                            currentTime: currentTime,
+                            size: event.loaded,
+                            totalSize: event.total
+                        }
+                    });
+                }), xhr.onload = function onXHRLoad(event) {
+                    if (4 === xhr.readyState) if (200 <= xhr.status && xhr.status < 300) {
+                        var responseData, receivedTime = performance.now(), totalSize = xhr.response instanceof ArrayBuffer ? xhr.response.byteLength : event.total, status = xhr.status, loadedResponseType = xhr.responseType, _url = xhr.responseURL || url;
+                        if (null == (
+                        // IE bug where response is string with responseType json
+                        responseData = "json" === loadedResponseType ? "string" !== xhr.response ? xhr.response : toJSONForIE(xhr.responseText) : xhr.response)) {
+                            var errorCode = error_codes.c.PARSE_ERROR;
+                            return void obs.error(new request_error.a(xhr, _url, errorCode));
+                        }
+                        obs.next({
+                            type: "response",
+                            value: {
+                                status: status,
+                                url: _url,
+                                responseType: loadedResponseType,
+                                sendingTime: sendingTime,
+                                receivedTime: receivedTime,
+                                duration: receivedTime - sendingTime,
+                                size: totalSize,
+                                responseData: responseData
+                            }
+                        }), obs.complete();
+                    } else {
+                        var _errorCode = error_codes.c.ERROR_HTTP_CODE;
+                        obs.error(new request_error.a(xhr, url, _errorCode));
+                    }
+                }, xhr.send(), function() {
+                    xhr && 4 !== xhr.readyState && xhr.abort();
+                };
+            });
+        };
+        // CONCATENATED MODULE: ./src/utils/request/index.ts
         /**
  * Copyright 2015 CANAL+ Group
  *
@@ -2446,12 +2549,9 @@ object-assign
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-        // true on IE11
-        // false on Edge and other IEs/browsers.
-        var isIE11 = !!window.MSInputMethodContext && !!document.documentMode, isIEOrEdge = "Microsoft Internet Explorer" === navigator.appName || "Netscape" === navigator.appName && /(Trident|Edge)\//.test(navigator.userAgent), isFirefox = -1 !== navigator.userAgent.toLowerCase().indexOf("firefox"), isSamsungBrowser = /SamsungBrowser/.test(navigator.userAgent);
- // true for IE / Edge
-        }, 
-    /* 22 */
+        /* harmony default export */        __webpack_exports__.a = xhr_request;
+    }, 
+    /* 23 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
         /**
@@ -2553,106 +2653,6 @@ object-assign
             }
         };
         /* harmony default export */        __webpack_exports__.a = INIT_EVENTS;
-    }, 
-    /* 23 */
-    /***/ function(module, __webpack_exports__, __webpack_require__) {
-        "use strict";
-        // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/Observable.js + 3 modules
-                var Observable = __webpack_require__(5), config = __webpack_require__(2), error_codes = __webpack_require__(20), request_error = __webpack_require__(177), DEFAULT_REQUEST_TIMEOUT = config.a.DEFAULT_REQUEST_TIMEOUT;
-        // EXTERNAL MODULE: ./src/config.ts
-                /**
- * @param {string} data
- * @returns {Object|null}
- */
-        function toJSONForIE(data) {
-            try {
-                return JSON.parse(data);
-            } catch (e) {
-                return null;
-            }
-        }
-        /* harmony default export */ var xhr_request = function request(options) {
-            var requestOptions = {
-                url: options.url,
-                headers: options.headers,
-                responseType: null == options.responseType ? "json" : options.responseType,
-                timeout: null == options.timeout ? DEFAULT_REQUEST_TIMEOUT : options.timeout
-            };
-            return new Observable.a(function(obs) {
-                var url = requestOptions.url, headers = requestOptions.headers, responseType = requestOptions.responseType, timeout = requestOptions.timeout, xhr = new XMLHttpRequest();
-                if (xhr.open("GET", url, !0), 0 <= timeout && (xhr.timeout = timeout), xhr.responseType = responseType, 
-                "document" === xhr.responseType && xhr.overrideMimeType("text/xml"), headers) {
-                    var _headers = headers;
-                    for (var key in _headers) _headers.hasOwnProperty(key) && xhr.setRequestHeader(key, _headers[key]);
-                }
-                var sendingTime = performance.now();
-                return xhr.onerror = function onXHRError() {
-                    var errorCode = error_codes.c.ERROR_EVENT;
-                    obs.error(new request_error.a(xhr, url, errorCode));
-                }, xhr.ontimeout = function onXHRTimeout() {
-                    var errorCode = error_codes.c.TIMEOUT;
-                    obs.error(new request_error.a(xhr, url, errorCode));
-                }, options.ignoreProgressEvents || (xhr.onprogress = function onXHRProgress(event) {
-                    var currentTime = performance.now();
-                    obs.next({
-                        type: "progress",
-                        value: {
-                            url: url,
-                            duration: currentTime - sendingTime,
-                            sendingTime: sendingTime,
-                            currentTime: currentTime,
-                            size: event.loaded,
-                            totalSize: event.total
-                        }
-                    });
-                }), xhr.onload = function onXHRLoad(event) {
-                    if (4 === xhr.readyState) if (200 <= xhr.status && xhr.status < 300) {
-                        var responseData, receivedTime = performance.now(), totalSize = xhr.response instanceof ArrayBuffer ? xhr.response.byteLength : event.total, status = xhr.status, loadedResponseType = xhr.responseType, _url = xhr.responseURL || url;
-                        if (null == (
-                        // IE bug where response is string with responseType json
-                        responseData = "json" === loadedResponseType ? "string" !== xhr.response ? xhr.response : toJSONForIE(xhr.responseText) : xhr.response)) {
-                            var errorCode = error_codes.c.PARSE_ERROR;
-                            return void obs.error(new request_error.a(xhr, _url, errorCode));
-                        }
-                        obs.next({
-                            type: "response",
-                            value: {
-                                status: status,
-                                url: _url,
-                                responseType: loadedResponseType,
-                                sendingTime: sendingTime,
-                                receivedTime: receivedTime,
-                                duration: receivedTime - sendingTime,
-                                size: totalSize,
-                                responseData: responseData
-                            }
-                        }), obs.complete();
-                    } else {
-                        var _errorCode = error_codes.c.ERROR_HTTP_CODE;
-                        obs.error(new request_error.a(xhr, url, _errorCode));
-                    }
-                }, xhr.send(), function() {
-                    xhr && 4 !== xhr.readyState && xhr.abort();
-                };
-            });
-        };
-        // CONCATENATED MODULE: ./src/utils/request/index.ts
-        /**
- * Copyright 2015 CANAL+ Group
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-        /* harmony default export */        __webpack_exports__.a = xhr_request;
     }, 
     /* 24 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
@@ -3855,7 +3855,7 @@ object-assign
         }
         //# sourceMappingURL=debounceTime.js.map
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/operators/startWith.js
-                var startWith = __webpack_require__(170), distinctUntilChanged = __webpack_require__(162), config = __webpack_require__(2), browser_compatibility_types = __webpack_require__(19);
+                var startWith = __webpack_require__(170), distinctUntilChanged = __webpack_require__(162), config = __webpack_require__(2), browser_compatibility_types = __webpack_require__(20);
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/operators/distinctUntilChanged.js
                 // CONCATENATED MODULE: ./src/compat/event_listeners.ts
         /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isInBackground$", function() {
@@ -4414,7 +4414,7 @@ object-assign
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/observable/defer.js
-                var defer = __webpack_require__(163), empty = __webpack_require__(36), combineLatest = __webpack_require__(174), merge = __webpack_require__(160), concat = __webpack_require__(71), of = __webpack_require__(37), ignoreElements = __webpack_require__(132), mergeMap = __webpack_require__(42), map = __webpack_require__(31), tap = __webpack_require__(118), catchError = __webpack_require__(164), filter = __webpack_require__(161), compat = __webpack_require__(7), should_unset_media_keys = __webpack_require__(120), log = __webpack_require__(0), byte_parsing = __webpack_require__(1), cast_to_observable = __webpack_require__(17), browser_detection = __webpack_require__(21), PSSH_TO_INTEGER = Object(byte_parsing.c)(Object(byte_parsing.p)("pssh"), 0);
+                var defer = __webpack_require__(163), empty = __webpack_require__(36), combineLatest = __webpack_require__(174), merge = __webpack_require__(160), concat = __webpack_require__(71), of = __webpack_require__(37), ignoreElements = __webpack_require__(132), mergeMap = __webpack_require__(42), map = __webpack_require__(31), tap = __webpack_require__(118), catchError = __webpack_require__(164), filter = __webpack_require__(161), compat = __webpack_require__(7), should_unset_media_keys = __webpack_require__(120), log = __webpack_require__(0), byte_parsing = __webpack_require__(1), cast_to_observable = __webpack_require__(17), browser_detection = __webpack_require__(19), PSSH_TO_INTEGER = Object(byte_parsing.c)(Object(byte_parsing.p)("pssh"), 0);
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/observable/empty.js
                 // CONCATENATED MODULE: ./src/compat/eme/generate_key_request.ts
         /**
@@ -5392,7 +5392,7 @@ object-assign
         }
         //# sourceMappingURL=concatMap.js.map
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/operators/mapTo.js
-                var mapTo = __webpack_require__(133), takeUntil = __webpack_require__(173), is_known_error = __webpack_require__(175), error_codes = __webpack_require__(20), timer = __webpack_require__(176), backoff_delay = __webpack_require__(84);
+                var mapTo = __webpack_require__(133), takeUntil = __webpack_require__(173), is_known_error = __webpack_require__(175), error_codes = __webpack_require__(21), timer = __webpack_require__(176), backoff_delay = __webpack_require__(84);
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/operators/takeUntil.js
                 // CONCATENATED MODULE: ./src/utils/rx-retry_with_backoff.ts
         /**
@@ -5865,7 +5865,8 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return clearElementSrc;
         });
-        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(21);
+        /* harmony import */ var _log__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0), _browser_detection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(19);
+        /* harmony import */        
         /**
  * Copyright 2015 CANAL+ Group
  *
@@ -5888,10 +5889,16 @@ object-assign
  * does not clear properly the current MediaKey Session.
  * Microsoft recommended to use element.removeAttr("src").
  * @param {HTMLMediaElement} element
- */        function clearElementSrc(element) {
-            if (_browser_detection__WEBPACK_IMPORTED_MODULE_0__.a) for (var textTracks = element.textTracks, i = 0; i < textTracks.length; i++) element.childNodes.forEach(function(node) {
-                "track" === node.nodeName && element.removeChild(node);
-            }), textTracks[i].mode = "disabled";
+ */
+        function clearElementSrc(element) {
+            if (_browser_detection__WEBPACK_IMPORTED_MODULE_1__.a) {
+                for (var textTracks = element.textTracks, i = 0; i < textTracks.length; i++) textTracks[i].mode = "disabled";
+                if (element.hasChildNodes()) for (var childNodes = element.childNodes, j = childNodes.length - 1; 0 <= j; j--) if ("track" === childNodes[j].nodeName) try {
+                    element.removeChild(childNodes[j]);
+                } catch (err) {
+                    _log__WEBPACK_IMPORTED_MODULE_0__.a.warn("Could not remove text track child from element.");
+                }
+            }
             element.src = "", element.removeAttribute("src");
         }
         /***/    }, 
@@ -6704,7 +6711,7 @@ object-assign
     /* 86 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
-        /* harmony import */        var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5), _utils_request__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(23);
+        /* harmony import */        var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5), _utils_request__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(22);
         /* harmony import */        
         /**
  * Copyright 2015 CANAL+ Group
@@ -6905,7 +6912,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return makeCue;
         });
-        /* harmony import */ var _log__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0), _browser_compatibility_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(19);
+        /* harmony import */ var _log__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0), _browser_compatibility_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(20);
         /* harmony import */        
         /**
  * Copyright 2015 CANAL+ Group
@@ -7065,7 +7072,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return shouldValidateMetadata;
         });
-        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(21);
+        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
         /**
  * Copyright 2015 CANAL+ Group
  *
@@ -7652,13 +7659,13 @@ object-assign
                     parsedPeriod;
                 }).sort(function(a, b) {
                     return a.start - b.start;
-                }), 
+                }), args.utcTimings && 0 < args.utcTimings.length && args.utcTimings[0].value && (_this._clockOffset = Date.now() - Date.parse(args.utcTimings[0].value), 
+                log.a.info("Manifest: Clock offset set to " + _this._clockOffset + "."))
                 /**
      * @deprecated It is here to ensure compatibility with the way the
      * v3.x.x manages adaptations at the Manifest level
      */
-                /* tslint:disable:deprecation */
-                _this.adaptations = _this.periods[0] && _this.periods[0].adaptations || {}, 
+                /* tslint:disable:deprecation */ , _this.adaptations = _this.periods[0] && _this.periods[0].adaptations || {}, 
                 /* tslint:enable:deprecation */
                 _this.minimumTime = args.minimumTime, _this.isLive = args.isLive, _this.uris = args.uris || [], 
                 _this.lifetime = args.lifetime, _this.suggestedPresentationDelay = args.suggestedPresentationDelay, 
@@ -7762,6 +7769,8 @@ object-assign
                                 newPeriodCounter < newPeriods.length && (log.a.info("Manifest: Adding new periods after update."), 
                 (_this$periods = this.periods).push.apply(_this$periods, newPeriods.slice(newPeriodCounter)));
                 this.trigger("manifestUpdate", null);
+            }, _proto.getTime = function getTime() {
+                return Date.now() - (this._clockOffset || 0);
             }
             /**
    * Get minimum position currently defined by the Manifest, in seconds.
@@ -7778,7 +7787,7 @@ object-assign
                     return null == duration ? Infinity : duration;
                 }
                 var ast = this.availabilityStartTime || 0, plg = this.presentationLiveGap || 0;
-                return Date.now() / 1e3 - ast - plg;
+                return this.getTime() / 1e3 - ast - plg;
             }
             /**
    * Get minimum AND maximum positions currently defined by the manifest, in
@@ -7786,12 +7795,12 @@ object-assign
    * @returns {Array.<number>}
    */ , _proto.getCurrentPositionLimits = function getCurrentPositionLimits() {
                 // TODO use RTT for the manifest request? (+ 3 or something)
-                var ast = this.availabilityStartTime || 0, minimumTime = null != this.minimumTime ? this.minimumTime : 0;
+                var minimumTime = null != this.minimumTime ? this.minimumTime : 0;
                 if (!this.isLive) {
                     var duration = this.getDuration();
                     return [ minimumTime, null == duration ? Infinity : duration ];
                 }
-                var plg = this.presentationLiveGap || 0, tsbd = this.timeShiftBufferDepth || 0, max = Date.now() / 1e3 - ast - plg;
+                var ast = this.availabilityStartTime || 0, plg = this.presentationLiveGap || 0, tsbd = this.timeShiftBufferDepth || 0, max = this.getTime() / 1e3 - ast - plg;
                 return [ Math.min(max, Math.max(minimumTime, max - tsbd + 5)), max ];
             }
             /**
@@ -7863,74 +7872,22 @@ object-assign
     /* 100 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
-        // CONCATENATED MODULE: ./src/parsers/texttracks/srt/find_end_of_cue_block.ts
-        /**
- * Copyright 2015 CANAL+ Group
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-        /**
- * Returns the first line that is not apart of the given cue block.
- * The index given can be anywhere in a known cue block.
- *
- * This function is extra-resilient due to observed real-life malformed
- * subtitles.
- * Basically, it allows some deviation from the specification as long as the
- * intent is pretty clear.
- * @param {Array<string>} linified - Whole srt. Line by line.
- * @param {number} startIndex - Index in `linified` of the first line within the
- * block.
- * @returns {number}
- */        function findEndOfCueBlock(linified, startIndex) {
-            // continue incrementing i until either:
-            //   - an empty line
-            //   - the end
-            for (var firstEmptyLineIndex = startIndex + 1; linified[firstEmptyLineIndex]; ) firstEmptyLineIndex++;
-            return firstEmptyLineIndex;
+        // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/operators/mergeMap.js
+                var mergeMap = __webpack_require__(42);
+        // CONCATENATED MODULE: ./node_modules/rxjs/_esm5/internal/util/identity.js
+        /** PURE_IMPORTS_START  PURE_IMPORTS_END */        function identity(x) {
+            return x;
         }
-        // CONCATENATED MODULE: ./src/parsers/texttracks/srt/get_cue_blocks.ts
+        //# sourceMappingURL=identity.js.map
+        // CONCATENATED MODULE: ./node_modules/rxjs/_esm5/internal/operators/mergeAll.js
         /* harmony export (binding) */        
-        /**
- * Copyright 2015 CANAL+ Group
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-        /**
- * Get cue blocks from a srt file.
- * @param {Array.<string>} linified - Whole srt file. Each new element in this
- * array is a new line.
- * @returns {Array.<Array.<string>>}
- */
-        function getCueBlocks(linified) {
-            for (var cueBlocks = [], i = 0; i < linified.length; i++) if (linified[i]) {
-                var endOfCue = findEndOfCueBlock(linified, i), cueBlockCandidate = linified.slice(i, endOfCue);
-                0 < cueBlockCandidate.length && (1 === cueBlockCandidate.length ? 0 <= cueBlockCandidate[0].indexOf("--\x3e") && cueBlocks.push(cueBlockCandidate) : (0 <= cueBlockCandidate[1].indexOf("--\x3e") || 0 <= cueBlockCandidate[0].indexOf("--\x3e")) && cueBlocks.push(cueBlockCandidate)), 
-                i = endOfCue;
-            }
-            return cueBlocks;
+        /** PURE_IMPORTS_START _mergeMap,_util_identity PURE_IMPORTS_END */
+        function mergeAll(concurrent) {
+            return void 0 === concurrent && (concurrent = Number.POSITIVE_INFINITY), Object(mergeMap.a)(identity, concurrent);
         }
+        //# sourceMappingURL=mergeAll.js.map
         /***/        __webpack_require__.d(__webpack_exports__, "a", function() {
-            return getCueBlocks;
+            return mergeAll;
         });
     }, 
     /* 101 */
@@ -8027,6 +7984,79 @@ object-assign
     /* 102 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
+        // CONCATENATED MODULE: ./src/parsers/texttracks/srt/find_end_of_cue_block.ts
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        /**
+ * Returns the first line that is not apart of the given cue block.
+ * The index given can be anywhere in a known cue block.
+ *
+ * This function is extra-resilient due to observed real-life malformed
+ * subtitles.
+ * Basically, it allows some deviation from the specification as long as the
+ * intent is pretty clear.
+ * @param {Array<string>} linified - Whole srt. Line by line.
+ * @param {number} startIndex - Index in `linified` of the first line within the
+ * block.
+ * @returns {number}
+ */        function findEndOfCueBlock(linified, startIndex) {
+            // continue incrementing i until either:
+            //   - an empty line
+            //   - the end
+            for (var firstEmptyLineIndex = startIndex + 1; linified[firstEmptyLineIndex]; ) firstEmptyLineIndex++;
+            return firstEmptyLineIndex;
+        }
+        // CONCATENATED MODULE: ./src/parsers/texttracks/srt/get_cue_blocks.ts
+        /* harmony export (binding) */        
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        /**
+ * Get cue blocks from a srt file.
+ * @param {Array.<string>} linified - Whole srt file. Each new element in this
+ * array is a new line.
+ * @returns {Array.<Array.<string>>}
+ */
+        function getCueBlocks(linified) {
+            for (var cueBlocks = [], i = 0; i < linified.length; i++) if (linified[i]) {
+                var endOfCue = findEndOfCueBlock(linified, i), cueBlockCandidate = linified.slice(i, endOfCue);
+                0 < cueBlockCandidate.length && (1 === cueBlockCandidate.length ? 0 <= cueBlockCandidate[0].indexOf("--\x3e") && cueBlocks.push(cueBlockCandidate) : (0 <= cueBlockCandidate[1].indexOf("--\x3e") || 0 <= cueBlockCandidate[0].indexOf("--\x3e")) && cueBlocks.push(cueBlockCandidate)), 
+                i = endOfCue;
+            }
+            return cueBlocks;
+        }
+        /***/        __webpack_require__.d(__webpack_exports__, "a", function() {
+            return getCueBlocks;
+        });
+    }, 
+    /* 103 */
+    /***/ function(module, __webpack_exports__, __webpack_require__) {
+        "use strict";
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/observable/of.js
                 var of = __webpack_require__(37), defer = __webpack_require__(163), tslib_es6 = __webpack_require__(3), Subscriber = __webpack_require__(8);
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/observable/defer.js
@@ -8104,28 +8134,122 @@ object-assign
             return updatePlaybackRate;
         });
     }, 
-    /* 103 */
+    /* 104 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
-        // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/operators/mergeMap.js
-                var mergeMap = __webpack_require__(42);
-        // CONCATENATED MODULE: ./node_modules/rxjs/_esm5/internal/util/identity.js
-        /** PURE_IMPORTS_START  PURE_IMPORTS_END */        function identity(x) {
-            return x;
+        // EXTERNAL MODULE: ./src/parsers/texttracks/ttml/regexps.ts
+                var regexps = __webpack_require__(18);
+        // CONCATENATED MODULE: ./src/parsers/texttracks/ttml/time_parsing.ts
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        /**
+ * Parses a TTML time into seconds.
+ * @param {string} text
+ * @param {Object} ttParams
+ * @returns {Number|undefined}
+ */        
+        /**
+ * Parses a TTML time in frame format
+ * @param {Object} ttParams
+ * @param {string} text
+ * @returns {Number}
+ */
+        function parseFramesTime(ttParams, text) {
+            // 75f or 75.5f
+            // (We cast as we're sure the regexp is respected here)
+            var results = regexps.g.exec(text);
+            return Number(results[1]) / ttParams.frameRate;
         }
-        //# sourceMappingURL=identity.js.map
-        // CONCATENATED MODULE: ./node_modules/rxjs/_esm5/internal/operators/mergeAll.js
+        /**
+ * Parses a TTML time in tick format
+ * @param {Object} ttParams
+ * @param {string} text
+ * @returns {Number}
+ */        function parseTickTime(ttParams, text) {
+            // 50t or 50.5t
+            // (We cast as we're sure the regexp is respected here)
+            var results = regexps.i.exec(text);
+            return Number(results[1]) / ttParams.tickRate;
+        }
+        /**
+ * Parses a TTML colon formatted time containing frames
+ * @param {Object} ttParams
+ * @param {string} text
+ * @returns {Number}
+ */        function parseColonTimeWithFrames(ttParams, text) {
+            // 01:02:43:07 ("07" is frames) or 01:02:43:07.1 (subframes)
+            // (We cast as we're sure the regexp is respected here)
+            var results = regexps.e.exec(text), hours = Number(results[1]), minutes = Number(results[2]), seconds = Number(results[3]), frames = Number(results[4]);
+            return (seconds += (frames += (Number(results[5]) || 0) / ttParams.subFrameRate) / ttParams.frameRate) + 60 * minutes + 3600 * hours;
+        }
+        /**
+ * Parses a TTML time with a given regex. Expects regex to be some
+ * sort of a time-matcher to match hours, minutes, seconds and milliseconds
+ *
+ * @param {RegExp} regex
+ * @param {string} text
+ * @returns {number|null}
+ */        function parseTimeFromRegExp(regex, text) {
+            var results = regex.exec(text);
+            if (null === results || "" === results[0]) return null;
+ // This capture is optional, but will still be in the array as undefined,
+            // default to 0.
+                        var hours = Number(results[1]) || 0, minutes = Number(results[2]) || 0, seconds = Number(results[3]) || 0;
+            return (Number(results[4]) || 0) / 1e3 + seconds + 60 * minutes + 3600 * hours;
+        }
+        /* harmony default export */        var time_parsing = function parseTime(text, ttParams) {
+            return regexps.e.test(text) ? parseColonTimeWithFrames(ttParams, text) : regexps.d.test(text) ? parseTimeFromRegExp(regexps.d, text) : regexps.f.test(text) ? parseTimeFromRegExp(regexps.f, text) : regexps.g.test(text) ? parseFramesTime(ttParams, text) : regexps.i.test(text) ? parseTickTime(ttParams, text) : regexps.h.test(text) ? parseTimeFromRegExp(regexps.h, text) : void 0;
+        };
+        // CONCATENATED MODULE: ./src/parsers/texttracks/ttml/get_time_delimiters.ts
         /* harmony export (binding) */        
-        /** PURE_IMPORTS_START _mergeMap,_util_identity PURE_IMPORTS_END */
-        function mergeAll(concurrent) {
-            return void 0 === concurrent && (concurrent = Number.POSITIVE_INFINITY), Object(mergeMap.a)(identity, concurrent);
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        /**
+ * Get start and end time of an element.
+ * @param {Element} element
+ * @param {Object} ttParams
+ * @returns {Object}
+ */
+        function getTimeDelimiters(element, ttParams) {
+            var beginAttr = element.getAttribute("begin"), durationAttr = element.getAttribute("dur"), endAttr = element.getAttribute("end"), start = beginAttr ? time_parsing(beginAttr, ttParams) : null, duration = durationAttr ? time_parsing(durationAttr, ttParams) : null, parsedEnd = endAttr ? time_parsing(endAttr, ttParams) : null;
+            if (null == start || null == parsedEnd && null == duration) throw new Error("Invalid text cue");
+ // Huh? Is TypeScript that dumb here?
+                        return {
+                start: start,
+                end: null == parsedEnd ? start + duration : parsedEnd
+            };
         }
-        //# sourceMappingURL=mergeAll.js.map
         /***/        __webpack_require__.d(__webpack_exports__, "a", function() {
-            return mergeAll;
+            return getTimeDelimiters;
         });
     }, 
-    /* 104 */
+    /* 105 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
         // CONCATENATED MODULE: ./src/parsers/texttracks/webvtt/parse_timestamp.ts
@@ -8240,121 +8364,6 @@ object-assign
         }
         /***/        __webpack_require__.d(__webpack_exports__, "a", function() {
             return parseCueBlock;
-        });
-    }, 
-    /* 105 */
-    /***/ function(module, __webpack_exports__, __webpack_require__) {
-        "use strict";
-        // EXTERNAL MODULE: ./src/parsers/texttracks/ttml/regexps.ts
-                var regexps = __webpack_require__(18);
-        // CONCATENATED MODULE: ./src/parsers/texttracks/ttml/time_parsing.ts
-        /**
- * Copyright 2015 CANAL+ Group
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-        /**
- * Parses a TTML time into seconds.
- * @param {string} text
- * @param {Object} ttParams
- * @returns {Number|undefined}
- */        
-        /**
- * Parses a TTML time in frame format
- * @param {Object} ttParams
- * @param {string} text
- * @returns {Number}
- */
-        function parseFramesTime(ttParams, text) {
-            // 75f or 75.5f
-            // (We cast as we're sure the regexp is respected here)
-            var results = regexps.g.exec(text);
-            return Number(results[1]) / ttParams.frameRate;
-        }
-        /**
- * Parses a TTML time in tick format
- * @param {Object} ttParams
- * @param {string} text
- * @returns {Number}
- */        function parseTickTime(ttParams, text) {
-            // 50t or 50.5t
-            // (We cast as we're sure the regexp is respected here)
-            var results = regexps.i.exec(text);
-            return Number(results[1]) / ttParams.tickRate;
-        }
-        /**
- * Parses a TTML colon formatted time containing frames
- * @param {Object} ttParams
- * @param {string} text
- * @returns {Number}
- */        function parseColonTimeWithFrames(ttParams, text) {
-            // 01:02:43:07 ("07" is frames) or 01:02:43:07.1 (subframes)
-            // (We cast as we're sure the regexp is respected here)
-            var results = regexps.e.exec(text), hours = Number(results[1]), minutes = Number(results[2]), seconds = Number(results[3]), frames = Number(results[4]);
-            return (seconds += (frames += (Number(results[5]) || 0) / ttParams.subFrameRate) / ttParams.frameRate) + 60 * minutes + 3600 * hours;
-        }
-        /**
- * Parses a TTML time with a given regex. Expects regex to be some
- * sort of a time-matcher to match hours, minutes, seconds and milliseconds
- *
- * @param {RegExp} regex
- * @param {string} text
- * @returns {number|null}
- */        function parseTimeFromRegExp(regex, text) {
-            var results = regex.exec(text);
-            if (null === results || "" === results[0]) return null;
- // This capture is optional, but will still be in the array as undefined,
-            // default to 0.
-                        var hours = Number(results[1]) || 0, minutes = Number(results[2]) || 0, seconds = Number(results[3]) || 0;
-            return (Number(results[4]) || 0) / 1e3 + seconds + 60 * minutes + 3600 * hours;
-        }
-        /* harmony default export */        var time_parsing = function parseTime(text, ttParams) {
-            return regexps.e.test(text) ? parseColonTimeWithFrames(ttParams, text) : regexps.d.test(text) ? parseTimeFromRegExp(regexps.d, text) : regexps.f.test(text) ? parseTimeFromRegExp(regexps.f, text) : regexps.g.test(text) ? parseFramesTime(ttParams, text) : regexps.i.test(text) ? parseTickTime(ttParams, text) : regexps.h.test(text) ? parseTimeFromRegExp(regexps.h, text) : void 0;
-        };
-        // CONCATENATED MODULE: ./src/parsers/texttracks/ttml/get_time_delimiters.ts
-        /* harmony export (binding) */        
-        /**
- * Copyright 2015 CANAL+ Group
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-        /**
- * Get start and end time of an element.
- * @param {Element} element
- * @param {Object} ttParams
- * @returns {Object}
- */
-        function getTimeDelimiters(element, ttParams) {
-            var beginAttr = element.getAttribute("begin"), durationAttr = element.getAttribute("dur"), endAttr = element.getAttribute("end"), start = beginAttr ? time_parsing(beginAttr, ttParams) : null, duration = durationAttr ? time_parsing(durationAttr, ttParams) : null, parsedEnd = endAttr ? time_parsing(endAttr, ttParams) : null;
-            if (null == start || null == parsedEnd && null == duration) throw new Error("Invalid text cue");
- // Huh? Is TypeScript that dumb here?
-                        return {
-                start: start,
-                end: null == parsedEnd ? start + duration : parsedEnd
-            };
-        }
-        /***/        __webpack_require__.d(__webpack_exports__, "a", function() {
-            return getTimeDelimiters;
         });
     }, 
     /* 106 */
@@ -8537,7 +8546,7 @@ object-assign
  * @returns {Array.<number>|null}
  */        function getBoxOffsets(buf, boxName) {
             for (var name, l = buf.length, i = 0, size = 0; i + 8 < l && (size = Object(_utils_byte_parsing__WEBPACK_IMPORTED_MODULE_1__.c)(buf, i), 
-            name = Object(_utils_byte_parsing__WEBPACK_IMPORTED_MODULE_1__.c)(buf, i + 4), Object(_utils_assert__WEBPACK_IMPORTED_MODULE_0__.b)(0 < size, "out of range size"), 
+            name = Object(_utils_byte_parsing__WEBPACK_IMPORTED_MODULE_1__.c)(buf, i + 4), Object(_utils_assert__WEBPACK_IMPORTED_MODULE_0__.b)(0 < size, "out of rangezz size"), 
             name !== boxName); ) i += size;
             return i < l ? [ i, i + size ] : null;
         }
@@ -8582,7 +8591,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return MediaError;
         });
-        /* harmony import */ var _error_codes__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20), _error_message__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(54);
+        /* harmony import */ var _error_codes__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(21), _error_message__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(54);
         /* harmony import */        function _inheritsLoose(subClass, superClass) {
             subClass.prototype = Object.create(superClass.prototype), (subClass.prototype.constructor = subClass).__proto__ = superClass;
         }
@@ -8781,7 +8790,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return isPlaybackStuck;
         });
-        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(21);
+        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
         /**
  * Copyright 2015 CANAL+ Group
  *
@@ -8913,7 +8922,7 @@ object-assign
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/Subject.js
-                var Subject = __webpack_require__(40), merge = __webpack_require__(160), throwError = __webpack_require__(69), of = __webpack_require__(37), takeUntil = __webpack_require__(173), byte_parsing = __webpack_require__(1), cast_to_observable = __webpack_require__(17), event_emitter = __webpack_require__(30), promise = __webpack_require__(27), browser_compatibility_types = __webpack_require__(19), browser_detection = __webpack_require__(21), event_listeners = __webpack_require__(53);
+                var Subject = __webpack_require__(40), merge = __webpack_require__(160), throwError = __webpack_require__(69), of = __webpack_require__(37), takeUntil = __webpack_require__(173), byte_parsing = __webpack_require__(1), cast_to_observable = __webpack_require__(17), event_emitter = __webpack_require__(30), promise = __webpack_require__(27), browser_compatibility_types = __webpack_require__(20), browser_detection = __webpack_require__(19), event_listeners = __webpack_require__(53);
         // EXTERNAL MODULE: ./node_modules/rxjs/_esm5/internal/observable/merge.js
                 // CONCATENATED MODULE: ./src/compat/eme/custom_key_system_access.ts
         function _defineProperties(target, props) {
@@ -9202,7 +9211,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return EncryptedMediaError;
         });
-        /* harmony import */ var _error_codes__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20), _error_message__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(54);
+        /* harmony import */ var _error_codes__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(21), _error_message__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(54);
         /* harmony import */        function _inheritsLoose(subClass, superClass) {
             subClass.prototype = Object.create(superClass.prototype), (subClass.prototype.constructor = subClass).__proto__ = superClass;
         }
@@ -9405,7 +9414,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return shouldUnsetMediaKeys;
         });
-        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(21);
+        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
         /**
  * Copyright 2015 CANAL+ Group
  *
@@ -9436,7 +9445,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return shouldRenewMediaKeys;
         });
-        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(21);
+        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
         /**
  * Copyright 2015 CANAL+ Group
  *
@@ -9466,7 +9475,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return canPatchISOBMFFSegment;
         });
-        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(21);
+        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
         /**
  * Copyright 2015 CANAL+ Group
  *
@@ -9502,7 +9511,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return isCodecSupported;
         });
-        /* harmony import */ var _browser_compatibility_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
+        /* harmony import */ var _browser_compatibility_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
         /**
  * Copyright 2015 CANAL+ Group
  *
@@ -9534,7 +9543,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return addTextTrack;
         });
-        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(21);
+        /* harmony import */ var _browser_detection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
         /**
  * Copyright 2015 CANAL+ Group
  *
@@ -9702,7 +9711,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return concatAll;
         });
-        /* harmony import */ var _mergeAll__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(103);
+        /* harmony import */ var _mergeAll__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(100);
         /** PURE_IMPORTS_START _mergeAll PURE_IMPORTS_END */        function concatAll() {
             return Object(_mergeAll__WEBPACK_IMPORTED_MODULE_0__.a)(1);
         }
@@ -10356,7 +10365,7 @@ object-assign
         /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() {
             return parseSRTStringToVTTCues;
         });
-        /* harmony import */ var _compat_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(90), _get_cue_blocks__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(100), _parse_cue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(101);
+        /* harmony import */ var _compat_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(90), _get_cue_blocks__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(102), _parse_cue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(101);
         /* harmony import */        
         /**
  * Copyright 2015 CANAL+ Group
@@ -10540,7 +10549,7 @@ object-assign
         /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() {
             return parseSRTStringToHTML;
         });
-        /* harmony import */ var _get_cue_blocks__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(100), _parse_cue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(101);
+        /* harmony import */ var _get_cue_blocks__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(102), _parse_cue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(101);
         /* harmony import */        
         /**
  * Copyright 2015 CANAL+ Group
@@ -10657,7 +10666,7 @@ object-assign
         /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() {
             return initializeDirectfileContent;
         });
-        /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(37), rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(160), rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(31), rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(42), rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(132), _compat__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(67), _compat__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(114), _errors__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(109), _log__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(0), _create_eme_manager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(95), _events_generators__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(22), _get_stalled_events__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(97), _initial_seek_and_play__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(92), _throw_on_media_error__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(96), _update_playback_rate__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(102);
+        /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(37), rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(160), rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(31), rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(42), rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(132), _compat__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(67), _compat__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(114), _errors__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(109), _log__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(0), _create_eme_manager__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(95), _events_generators__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(23), _get_stalled_events__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(97), _initial_seek_and_play__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(92), _throw_on_media_error__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(96), _update_playback_rate__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(103);
         /* harmony import */        
         /**
  * Copyright 2015 CANAL+ Group
@@ -10815,7 +10824,7 @@ object-assign
                     this.destination.error(err);
                 }
             }, SkipWhileSubscriber;
-        }(Subscriber.a), switchMapTo = __webpack_require__(179), mergeMapTo = __webpack_require__(172), catchError = __webpack_require__(164), config = __webpack_require__(2), log = __webpack_require__(0), event_emitter = __webpack_require__(30), noop = __webpack_require__(26), promise = __webpack_require__(27), utils_ranges = __webpack_require__(14), warn_once = __webpack_require__(34), compat = __webpack_require__(7), fullscreen = __webpack_require__(72), error_codes = __webpack_require__(20), media_error = __webpack_require__(109), features = __webpack_require__(10), eme_manager = __webpack_require__(65), timer = __webpack_require__(176), mergeMap = __webpack_require__(42), tap = __webpack_require__(118), ignoreElements = __webpack_require__(132), switchMap = __webpack_require__(115), Observable = __webpack_require__(5);
+        }(Subscriber.a), switchMapTo = __webpack_require__(179), mergeMapTo = __webpack_require__(172), catchError = __webpack_require__(164), config = __webpack_require__(2), log = __webpack_require__(0), event_emitter = __webpack_require__(30), noop = __webpack_require__(26), promise = __webpack_require__(27), utils_ranges = __webpack_require__(14), warn_once = __webpack_require__(34), compat = __webpack_require__(7), fullscreen = __webpack_require__(72), error_codes = __webpack_require__(21), media_error = __webpack_require__(109), features = __webpack_require__(10), eme_manager = __webpack_require__(65), timer = __webpack_require__(176), mergeMap = __webpack_require__(42), tap = __webpack_require__(118), ignoreElements = __webpack_require__(132), switchMap = __webpack_require__(115), Observable = __webpack_require__(5);
         // CONCATENATED MODULE: ./src/utils/rx-throttle.ts
         /**
  * Copyright 2015 CANAL+ Group
@@ -12499,7 +12508,7 @@ object-assign
                 var segmentFetcher = createSegmentFetcher(bufferType, this._transport, this._metrics$, this._requestsInfos$, this._warning$, options);
                 return applyPrioritizerToSegmentFetcher(this._prioritizer, segmentFetcher);
             }, SegmentPipelinesManager;
-        }(), create_eme_manager = __webpack_require__(95), clear_element_src = __webpack_require__(67), browser_compatibility_types = __webpack_require__(19), onSourceOpen$ = compat.a.onSourceOpen$;
+        }(), create_eme_manager = __webpack_require__(95), clear_element_src = __webpack_require__(67), browser_compatibility_types = __webpack_require__(20), onSourceOpen$ = compat.a.onSourceOpen$;
         // CONCATENATED MODULE: ./src/core/pipelines/segment/index.ts
         /**
  * Copyright 2015 CANAL+ Group
@@ -12592,7 +12601,7 @@ object-assign
             }));
         }
         // EXTERNAL MODULE: ./src/core/init/events_generators.ts
-                var events_generators = __webpack_require__(22), DEFAULT_LIVE_GAP = config.a.DEFAULT_LIVE_GAP;
+                var events_generators = __webpack_require__(23), DEFAULT_LIVE_GAP = config.a.DEFAULT_LIVE_GAP;
         // CONCATENATED MODULE: ./src/core/init/get_initial_time.ts
         /**
  * Copyright 2015 CANAL+ Group
@@ -15329,7 +15338,7 @@ object-assign
             }));
         }
         // EXTERNAL MODULE: ./src/core/init/get_stalled_events.ts
-                var get_stalled_events = __webpack_require__(97), initial_seek_and_play = __webpack_require__(92), update_playback_rate = __webpack_require__(102);
+                var get_stalled_events = __webpack_require__(97), initial_seek_and_play = __webpack_require__(92), update_playback_rate = __webpack_require__(103);
         // EXTERNAL MODULE: ./src/core/init/initial_seek_and_play.ts
                 // CONCATENATED MODULE: ./src/core/init/load_on_media_source.ts
         /**
@@ -15347,13 +15356,28 @@ object-assign
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+        function waitForInitialPeriod(manifest, initialTime) {
+            var initialPeriod = manifest.getPeriodForTime(initialTime);
+            if (null != initialPeriod) return Object(of.a)({
+                initialPeriod: initialPeriod,
+                initialTime: initialTime
+            });
+ // If first period has not started yet.
+                        if (0 < manifest.periods.length && manifest.periods[0].start > initialTime) {
+                var firstPeriod = manifest.periods[0], waitTime = 1e3 * (firstPeriod.start - initialTime);
+                return log.a.info("Wait for " + waitTime), Object(timer.a)(waitTime).pipe(Object(mapTo.a)({
+                    initialPeriod: firstPeriod,
+                    initialTime: 0
+                }));
+            }
+            throw new media_error.a("MEDIA_STARTING_TIME_NOT_FOUND", null, !0);
+        }
         /**
  * Returns a function allowing to load or reload the content in arguments into
  * a single or multiple MediaSources.
  * @param {Object} args
  * @returns {Observable}
- */
-        function createMediaSourceLoader(_ref) {
+ */        function createMediaSourceLoader(_ref) {
             var mediaElement = _ref.mediaElement, manifest = _ref.manifest, clock$ = _ref.clock$, speed$ = _ref.speed$, bufferOptions = _ref.bufferOptions, abrManager = _ref.abrManager, segmentPipelinesManager = _ref.segmentPipelinesManager;
             /**
    * Load the content on the given MediaSource.
@@ -15361,59 +15385,66 @@ object-assign
    * @param {number} initialTime
    * @param {boolean} autoPlay
    */            return function loadContentOnMediaSource(mediaSource, initialTime, autoPlay) {
-                // TODO Update the duration if it evolves?
-                var duration = manifest.getDuration();
-                setDurationToMediaSource(mediaSource, null == duration ? Infinity : duration);
-                var initialPeriod = manifest.getPeriodForTime(initialTime);
-                if (null == initialPeriod) throw new media_error.a("MEDIA_STARTING_TIME_NOT_FOUND", null, !0);
- // Creates SourceBuffersManager allowing to create and keep track of a
-                // single SourceBuffer per type.
-                                var sourceBuffersManager = new source_buffers(mediaElement, mediaSource);
+                var setup = function setup(initialPeriod, initialTime) {
+                    // TODO Update the duration if it evolves?
+                    var duration = manifest.getDuration();
+                    setDurationToMediaSource(mediaSource, null == duration ? Infinity : duration);
+                    // Creates SourceBuffersManager allowing to create and keep track of a
+                    // single SourceBuffer per type.
+                    var sourceBuffersManager = new source_buffers(mediaElement, mediaSource);
  // Initialize all native source buffers from the first period at the same
-                // time.
-                // We cannot lazily create native sourcebuffers since the spec does not
-                // allow adding them during playback.
-                //
-                // From https://w3c.github.io/media-source/#methods
-                //    For example, a user agent may throw a QuotaExceededError
-                //    exception if the media element has reached the HAVE_METADATA
-                //    readyState. This can occur if the user agent's media engine
-                //    does not support adding more tracks during playback.
-                                createNativeSourceBuffersForPeriod(sourceBuffersManager, initialPeriod);
-                var _seekAndLoadOnMediaEv = Object(initial_seek_and_play.a)(clock$, mediaElement, initialTime, autoPlay), seek$ = _seekAndLoadOnMediaEv.seek$, load$ = _seekAndLoadOnMediaEv.load$, bufferClock$ = createBufferClock(manifest, clock$, seek$, speed$, initialTime), cancelEndOfStream$ = new Subject.a(), buffers$ = core_buffers({
-                    manifest: manifest,
-                    initialPeriod: initialPeriod
-                }, bufferClock$, abrManager, sourceBuffersManager, segmentPipelinesManager, bufferOptions).pipe(Object(mergeMap.a)(function(evt) {
-                    switch (evt.type) {
-                      case "end-of-stream":
-                        return log.a.debug("Init: end-of-stream order received."), maintainEndOfStream(mediaSource).pipe(Object(ignoreElements.a)(), Object(takeUntil.a)(cancelEndOfStream$));
+                    // time.
+                    // We cannot lazily create native sourcebuffers since the spec does not
+                    // allow adding them during playback.
+                    //
+                    // From https://w3c.github.io/media-source/#methods
+                    //    For example, a user agent may throw a QuotaExceededError
+                    //    exception if the media element has reached the HAVE_METADATA
+                    //    readyState. This can occur if the user agent's media engine
+                    //    does not support adding more tracks during playback.
+                                        createNativeSourceBuffersForPeriod(sourceBuffersManager, initialPeriod);
+                    var _seekAndLoadOnMediaEv = Object(initial_seek_and_play.a)(clock$, mediaElement, initialTime, autoPlay), seek$ = _seekAndLoadOnMediaEv.seek$, load$ = _seekAndLoadOnMediaEv.load$, bufferClock$ = createBufferClock(manifest, clock$, seek$, speed$, initialTime), cancelEndOfStream$ = new Subject.a(), buffers$ = core_buffers({
+                        manifest: manifest,
+                        initialPeriod: initialPeriod
+                    }, bufferClock$, abrManager, sourceBuffersManager, segmentPipelinesManager, bufferOptions).pipe(Object(mergeMap.a)(function(evt) {
+                        switch (evt.type) {
+                          case "end-of-stream":
+                            return log.a.debug("Init: end-of-stream order received."), maintainEndOfStream(mediaSource).pipe(Object(ignoreElements.a)(), Object(takeUntil.a)(cancelEndOfStream$));
 
-                      case "resume-stream":
-                        return log.a.debug("Init: resume-stream order received."), cancelEndOfStream$.next(null), 
-                        empty.a;
+                          case "resume-stream":
+                            return log.a.debug("Init: resume-stream order received."), cancelEndOfStream$.next(null), 
+                            empty.a;
 
-                      case "discontinuity-encountered":
-                        return source_buffers.isNative(evt.value.bufferType) && (log.a.warn("Init: Explicit discontinuity seek", evt.value.nextTime), 
-                        mediaElement.currentTime = evt.value.nextTime), empty.a;
+                          case "discontinuity-encountered":
+                            return source_buffers.isNative(evt.value.bufferType) && (log.a.warn("Init: Explicit discontinuity seek", evt.value.nextTime), 
+                            mediaElement.currentTime = evt.value.nextTime), empty.a;
 
-                      default:
-                        return Object(of.a)(evt);
-                    }
-                })), playbackRate$ = Object(update_playback_rate.a)(mediaElement, speed$, clock$, {
-                    pauseWhenStalled: !0
-                }).pipe(Object(map.a)(events_generators.a.speedChanged)), stalled$ = Object(get_stalled_events.a)(mediaElement, clock$).pipe(Object(map.a)(events_generators.a.stalled)), loadedEvent$ = load$.pipe(Object(mergeMap.a)(function(evt) {
-                    if ("autoplay-blocked" === evt) {
-                        var error = new media_error.a("MEDIA_ERR_BLOCKED_AUTOPLAY", null, !1);
-                        return Object(of.a)(events_generators.a.warning(error), events_generators.a.loaded());
-                    }
-                    if ("not-loaded-metadata" !== evt) return log.a.debug("Init: The current content is loaded."), 
-                    Object(of.a)(events_generators.a.loaded());
-                    var _error = new media_error.a("MEDIA_ERR_NOT_LOADED_METADATA", null, !1);
-                    return Object(of.a)(events_generators.a.warning(_error));
-                }));
-                return Object(merge.a)(loadedEvent$, playbackRate$, stalled$, buffers$).pipe(finalize(function() {
-                    // clean-up every created SourceBuffers
-                    sourceBuffersManager.disposeAll();
+                          default:
+                            return Object(of.a)(evt);
+                        }
+                    })), playbackRate$ = Object(update_playback_rate.a)(mediaElement, speed$, clock$, {
+                        pauseWhenStalled: !0
+                    }).pipe(Object(map.a)(events_generators.a.speedChanged)), stalled$ = Object(get_stalled_events.a)(mediaElement, clock$).pipe(Object(map.a)(events_generators.a.stalled)), loadedEvent$ = load$.pipe(Object(mergeMap.a)(function(evt) {
+                        if ("autoplay-blocked" === evt) {
+                            var error = new media_error.a("MEDIA_ERR_BLOCKED_AUTOPLAY", null, !1);
+                            return Object(of.a)(events_generators.a.warning(error), events_generators.a.loaded());
+                        }
+                        if ("not-loaded-metadata" !== evt) return log.a.debug("Init: The current content is loaded."), 
+                        Object(of.a)(events_generators.a.loaded());
+                        var _error = new media_error.a("MEDIA_ERR_NOT_LOADED_METADATA", null, !1);
+                        return Object(of.a)(events_generators.a.warning(_error));
+                    }));
+                    return Object(merge.a)(loadedEvent$, playbackRate$, stalled$, buffers$).pipe(finalize(function() {
+                        // clean-up every created SourceBuffers
+                        sourceBuffersManager.disposeAll();
+                    }));
+                };
+                return waitForInitialPeriod(manifest, initialTime).pipe(Object(tap.a)(function(_ref2) {
+                    var initialPeriod = _ref2.initialPeriod, initialTime = _ref2.initialTime;
+                    return log.a.info("GOT FIRST PERIOD: start=" + initialPeriod.start + " initialTime=" + initialTime);
+                }), Object(switchMap.a)(function(_ref3) {
+                    var initialPeriod = _ref3.initialPeriod, initialTime = _ref3.initialTime;
+                    return setup(initialPeriod, initialTime);
                 }));
             };
         }
@@ -17779,11 +17810,11 @@ object-assign
         function initializeFeaturesObject() {
             features.a.emeManager = __webpack_require__(119).default, features.a.imageBuffer = __webpack_require__(157).default, 
             features.a.imageParser = __webpack_require__(141).default, features.a.transports.smooth = __webpack_require__(151).default, 
-            features.a.transports.dash = __webpack_require__(150).default, features.a.nativeTextTracksBuffer = __webpack_require__(156).default, 
-            features.a.nativeTextTracksParsers.vtt = __webpack_require__(154).default, features.a.nativeTextTracksParsers.ttml = __webpack_require__(158).default, 
+            features.a.transports.dash = __webpack_require__(150).default, features.a.nativeTextTracksBuffer = __webpack_require__(154).default, 
+            features.a.nativeTextTracksParsers.vtt = __webpack_require__(155).default, features.a.nativeTextTracksParsers.ttml = __webpack_require__(158).default, 
             features.a.nativeTextTracksParsers.sami = __webpack_require__(142).default, features.a.nativeTextTracksParsers.srt = __webpack_require__(143).default, 
             features.a.htmlTextTracksBuffer = __webpack_require__(153).default, features.a.htmlTextTracksParsers.sami = __webpack_require__(144).default, 
-            features.a.htmlTextTracksParsers.ttml = __webpack_require__(155).default, features.a.htmlTextTracksParsers.srt = __webpack_require__(145).default, 
+            features.a.htmlTextTracksParsers.ttml = __webpack_require__(156).default, features.a.htmlTextTracksParsers.srt = __webpack_require__(145).default, 
             features.a.htmlTextTracksParsers.vtt = __webpack_require__(152).default, features.a.directfile = __webpack_require__(146).default;
         }();
         /* harmony default export */ __webpack_exports__.default = api;
@@ -17994,8 +18025,8 @@ object-assign
             if (0 === manifest.periods.length) throw new Error("DASH Parser: no period available for a live content");
             var lastPeriodAdaptations = manifest.periods[manifest.periods.length - 1].adaptations, firstAdaptationsFromLastPeriod = lastPeriodAdaptations.video || lastPeriodAdaptations.audio;
             if (!firstAdaptationsFromLastPeriod || !firstAdaptationsFromLastPeriod.length) throw new Error("DASH Parser: Can't find first adaptation from last period");
-            var lastRef = getLastLiveTimeReference(firstAdaptationsFromLastPeriod[0]), ast = manifest.availabilityStartTime || 0;
-            return null != lastRef ? Date.now() / 1e3 - (lastRef + ast) : 10;
+            var lastRef = getLastLiveTimeReference(firstAdaptationsFromLastPeriod[0]), ast = manifest.availabilityStartTime || 0, now = manifest.utcTimings && 0 < manifest.utcTimings.length && manifest.utcTimings[0].value ? Date.parse(manifest.utcTimings[0].value) : Date.now();
+            return null != lastRef ? now / 1e3 - (lastRef + ast) : 10;
         }
         // CONCATENATED MODULE: ./src/parsers/manifest/dash/node_parsers/ContentComponent.ts
         /**
@@ -18896,7 +18927,7 @@ object-assign
  * @param {NodeList} mpdChildren
  * @returns {Object}
  */        function parseMPDChildren(mpdChildren) {
-            for (var baseURL = "", locations = [], periods = [], i = 0; i < mpdChildren.length; i++) if (mpdChildren[i].nodeType === Node.ELEMENT_NODE) {
+            for (var baseURL = "", locations = [], periods = [], utcTimings = [], i = 0; i < mpdChildren.length; i++) if (mpdChildren[i].nodeType === Node.ELEMENT_NODE) {
                 var currentNode = mpdChildren[i];
                 switch (currentNode.nodeName) {
                   case "BaseURL":
@@ -18910,12 +18941,18 @@ object-assign
                   case "Period":
                     var period = createPeriodIntermediateRepresentation(currentNode);
                     periods.push(period);
+                    break;
+
+                  case "UTCTiming":
+                    var utcTiming = parseScheme(currentNode);
+                    utcTimings.push(utcTiming);
                 }
             }
             return {
                 baseURL: baseURL,
                 locations: locations,
-                periods: periods
+                periods: periods,
+                utcTimings: utcTimings
             };
         }
         /**
@@ -20164,23 +20201,38 @@ object-assign
                     ressource: xlinkHref
                 });
             }
-            return 0 !== xlinksToLoad.length ? {
+            var utcTimingsToLoad = mpdIR.children.utcTimings.filter(function(utcTiming) {
+                return "urn:mpeg:dash:utc:http-iso:2014" === utcTiming.schemeIdUri;
+            });
+            return 0 !== xlinksToLoad.length || 0 !== utcTimingsToLoad.length ? {
                 type: "needs-ressources",
                 value: {
-                    ressources: xlinksToLoad.map(function(_ref) {
-                        return _ref.ressource;
-                    }),
+                    ressources: [].concat(xlinksToLoad.map(function(_ref) {
+                        return {
+                            type: "xlink",
+                            url: _ref.ressource
+                        };
+                    }), utcTimingsToLoad.map(function(_ref2) {
+                        return {
+                            type: "http-iso",
+                            url: _ref2.value || ""
+                        };
+                    })),
                     continue: function continueParsingMPD(loadedRessources) {
-                        if (loadedRessources.length !== xlinksToLoad.length) throw new Error("DASH parser: wrong number of loaded ressources.");
+                        if (loadedRessources.length !== xlinksToLoad.length + utcTimingsToLoad.length) throw new Error("DASH parser: wrong number of loaded ressources.");
  // Note: It is important to go from the last index to the first index in
                         // the resulting array, as we will potentially add elements to the array
-                                                for (var _i = loadedRessources.length - 1; 0 <= _i; _i--) {
+                                                for (var _i = xlinksToLoad.length - 1; 0 <= _i; _i--) {
                             var _mpdIR$children$perio2, index = xlinksToLoad[_i].index, wrappedData = "<root>" + loadedRessources[_i] + "</root>", dataAsXML = new DOMParser().parseFromString(wrappedData, "text/xml");
                             if (!dataAsXML || 0 === dataAsXML.children.length) throw new Error("DASH parser: Invalid external ressources");
                             for (var periods = dataAsXML.children[0].children, periodsIR = [], j = 0; j < periods.length; j++) periods[j].nodeType === Node.ELEMENT_NODE && periodsIR.push(createPeriodIntermediateRepresentation(periods[j]));
  // replace original "xlinked" periods by the real deal
                                                         // replace original "xlinked" periods by the real deal
                             (_mpdIR$children$perio2 = mpdIR.children.periods).splice.apply(_mpdIR$children$perio2, [ index, 1 ].concat(periodsIR));
+                        }
+                        for (var _j = 0; _j < utcTimingsToLoad.length; _j++) {
+                            var utcTiming = utcTimingsToLoad[_j];
+                            utcTiming.schemeIdUri = "urn:mpeg:dash:utc:direct:2014", utcTiming.value = loadedRessources[xlinksToLoad.length + _j].trim();
                         }
                         return loadExternalRessourcesAndParse(mpdIR, uri);
                     }
@@ -20217,7 +20269,8 @@ object-assign
                 transportType: "dash",
                 isLive: isDynamic,
                 uris: [ uri ].concat(rootChildren.locations),
-                suggestedPresentationDelay: null != rootAttributes.suggestedPresentationDelay ? rootAttributes.suggestedPresentationDelay : config.a.DEFAULT_SUGGESTED_PRESENTATION_DELAY.DASH
+                suggestedPresentationDelay: null != rootAttributes.suggestedPresentationDelay ? rootAttributes.suggestedPresentationDelay : config.a.DEFAULT_SUGGESTED_PRESENTATION_DELAY.DASH,
+                utcTimings: rootChildren.utcTimings
             };
             // -- add optional fields --
             return "static" !== rootAttributes.type && null != rootAttributes.availabilityEndTime && (parsedMPD.availabilityEndTime = rootAttributes.availabilityEndTime), 
@@ -20266,7 +20319,7 @@ object-assign
             var root = document.documentElement;
             if (!root || "MPD" !== root.nodeName) throw new Error("DASH Parser: document root should be MPD");
             return parseMPD(root, uri);
-        }, request = __webpack_require__(23), manifest_loader = __webpack_require__(86);
+        }, request = __webpack_require__(22), manifest_loader = __webpack_require__(86);
         // EXTERNAL MODULE: ./src/utils/request/index.ts + 1 modules
                 /* harmony default export */ var isobmff_timing_infos = 
         // CONCATENATED MODULE: ./src/transports/dash/isobmff_timing_infos.ts
@@ -20625,6 +20678,17 @@ object-assign
                 return e.value.responseData;
             }));
         }
+        function requestHttpIso(url) {
+            return Object(request.a)({
+                url: url,
+                responseType: "text",
+                ignoreProgressEvents: !0
+            }).pipe(Object(filter.a)(function(e) {
+                return "response" === e.type;
+            }), Object(map.a)(function(e) {
+                return e.value.responseData;
+            }));
+        }
         /**
  * Returns pipelines used for DASH streaming.
  * @param {Object} options
@@ -20687,7 +20751,7 @@ object-assign
                     },
                     parser: function parser(_ref2) {
                         var response = _ref2.response, loaderURL = _ref2.url, scheduleRequest = _ref2.scheduleRequest, url = null == response.url ? loaderURL : response.url, data = "string" == typeof response.responseData ? new DOMParser().parseFromString(response.responseData, "text/xml") : response.responseData;
-                        return function loadExternalRessources(parserResponse) {
+                        return function loadExternalResources(parserResponse) {
                             if ("done" === parserResponse.type) {
                                 var manifest = new src_manifest.a(parserResponse.value, options);
                                 return Object(of.a)({
@@ -20695,13 +20759,13 @@ object-assign
                                     url: url
                                 });
                             }
-                            var _parserResponse$value = parserResponse.value, ressources = _parserResponse$value.ressources, continueParsing = _parserResponse$value.continue, externalXlinks$ = ressources.map(function(ressourceURL) {
+                            var _parserResponse$value = parserResponse.value, ressources = _parserResponse$value.ressources, continueParsing = _parserResponse$value.continue, externalResources$ = ressources.map(function(resource) {
                                 return scheduleRequest(function() {
-                                    return requestXLink(ressourceURL);
+                                    return "xlink" === resource.type ? requestXLink(resource.url) : requestHttpIso(resource.url);
                                 });
                             });
-                            return Object(combineLatest.a)(externalXlinks$).pipe(Object(mergeMap.a)(function(loadedRessources) {
-                                return loadExternalRessources(continueParsing(loadedRessources));
+                            return Object(combineLatest.a)(externalResources$).pipe(Object(mergeMap.a)(function(loadedResources) {
+                                return loadExternalResources(continueParsing(loadedResources));
                             }));
                         }(dash(data, url));
                     }
@@ -21581,7 +21645,7 @@ object-assign
                 };
                 return Object(check_manifest_ids.a)(manifest), manifest;
             };
-        }, request = __webpack_require__(23), string_from_utf8 = __webpack_require__(88), warn_once = __webpack_require__(34), manifest_loader = __webpack_require__(86), utils = __webpack_require__(178), can_patch_isobmff = __webpack_require__(122), SAMPLING_FREQUENCIES = [ 96e3, 88200, 64e3, 48e3, 44100, 32e3, 24e3, 22050, 16e3, 12e3, 11025, 8e3, 7350 ], boxNamesMem = {};
+        }, request = __webpack_require__(22), string_from_utf8 = __webpack_require__(88), warn_once = __webpack_require__(34), manifest_loader = __webpack_require__(86), utils = __webpack_require__(178), can_patch_isobmff = __webpack_require__(122), SAMPLING_FREQUENCIES = [ 96e3, 88200, 64e3, 48e3, 44100, 32e3, 24e3, 22050, 16e3, 12e3, 11025, 8e3, 7350 ], boxNamesMem = {};
         // CONCATENATED MODULE: ./src/parsers/manifest/smooth/index.ts
         /**
  * Copyright 2015 CANAL+ Group
@@ -22540,7 +22604,7 @@ object-assign
             return styleBlocks;
         }
         // EXTERNAL MODULE: ./src/parsers/texttracks/webvtt/parse_cue_block.ts + 1 modules
-                var parse_cue_block = __webpack_require__(104), colorMap = {
+                var parse_cue_block = __webpack_require__(105), colorMap = {
             white: "#ffffff",
             lime: "#00ff00",
             cyan: "#00ffff",
@@ -23225,8 +23289,205 @@ object-assign
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
         __webpack_require__.r(__webpack_exports__);
+        // EXTERNAL MODULE: ./src/compat/add_text_track.ts
+        var add_text_track = __webpack_require__(124), log = __webpack_require__(0), browser_detection = __webpack_require__(19);
+        // EXTERNAL MODULE: ./src/log.ts + 1 modules
+                // CONCATENATED MODULE: ./src/compat/remove_cue.ts
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        /**
+ * Return true if given cue is active.
+ * @param {TextTrack} track
+ * @param {TextTrackCue} cue
+ * @returns {boolean}
+ */
+        function isActiveCue(track, cue) {
+            for (var activeCues = track.activeCues, i = 0; i < activeCues.length; i++) if (activeCues[i] === cue) return !0;
+            return !1;
+        }
+        /**
+ * Remove cue from text track.
+ * @param {TextTrack} track
+ * @param {TextTrackCue} cue
+ */        function removeCue(track, cue) {
+            // On Firefox, cue doesn't dissapear when it is removed from track. Track
+            // should be hidden, and shown again after removing cue, in order to
+            // definitely clean the cue.
+            if (browser_detection.a && isActiveCue(track, cue)) {
+                var trackMode = track.mode;
+                track.mode = "hidden";
+                try {
+                    track.removeCue(cue);
+                } catch (err) {
+                    log.a.warn("Compat: Could not remove cue from text track.");
+                }
+                track.mode = trackMode;
+            } else try {
+                track.removeCue(cue);
+            } catch (err) {
+                log.a.warn("Compat: Could not remove cue from text track.");
+            }
+        }
+        // EXTERNAL MODULE: ./src/core/source_buffers/abstract_source_buffer.ts + 1 modules
+                var abstract_source_buffer = __webpack_require__(63), features = __webpack_require__(10);
+        // EXTERNAL MODULE: ./src/features/index.ts
+                // CONCATENATED MODULE: ./src/core/source_buffers/text/native/parsers.ts
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        /**
+ * Convert text track data into timed VTT Cues.
+ * @param {string} type - Text track format wanted
+ * @param {string} data - Text track data
+ * @param {Number} timestampOffset - offset to apply to every timed text
+ * @param {string} [language] - language of the text tracks
+ * @returns {Array.<VTTCue>}
+ * @throws Error - Throw if no parser is found for the given type
+ */
+        function parseTextTrackToCues(type, data, timestampOffset, language) {
+            log.a.debug("NTSB: Finding parser for native text tracks:", type);
+            var parser = features.a.nativeTextTracksParsers[type];
+            if (!parser) throw new Error("no parser found for the given text track");
+            log.a.debug("NTSB: Parser found, parsing...");
+            var parsed = parser(data, timestampOffset, language);
+            return log.a.debug("NTSB: Parsed successfully!", parsed), parsed;
+        }
+        // CONCATENATED MODULE: ./src/core/source_buffers/text/native/native_text_source_buffer.ts
+                function _inheritsLoose(subClass, superClass) {
+            subClass.prototype = Object.create(superClass.prototype), (subClass.prototype.constructor = subClass).__proto__ = superClass;
+        }
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        /**
+ * SourceBuffer to display TextTracks in a <track> element, in the given
+ * video element.
+ * @class NativeTextSourceBuffer
+ * @extends AbstractSourceBuffer
+ */        var native_text_source_buffer_NativeTextSourceBuffer = 
+        /* */
+        function(_AbstractSourceBuffer) {
+            /**
+   * @param {HTMLMediaElement} videoElement
+   * @param {Boolean} hideNativeSubtitle
+   */
+            function NativeTextSourceBuffer(videoElement, hideNativeSubtitle) {
+                var _this;
+                log.a.debug("NTSB: Creating native text track SourceBuffer"), _this = _AbstractSourceBuffer.call(this) || this;
+                var _addTextTrack = Object(add_text_track.a)(videoElement, hideNativeSubtitle), track = _addTextTrack.track, trackElement = _addTextTrack.trackElement;
+                return _this._videoElement = videoElement, _this._track = track, _this._trackElement = trackElement, 
+                _this;
+            }
+            /**
+   * Append text tracks.
+   * @param {Object} data
+   */            _inheritsLoose(NativeTextSourceBuffer, _AbstractSourceBuffer);
+            var _proto = NativeTextSourceBuffer.prototype;
+            return _proto._append = function _append(data) {
+                log.a.debug("NTSB: Appending new native text tracks", data);
+                var timescale = data.timescale, timescaledStart = data.start, timescaledEnd = data.end, dataString = data.data, type = data.type, language = data.language;
+                if (null != timescaledEnd && timescaledEnd - timescaledStart <= 0) 
+                // this is accepted for error resilience, just skip that case.
+                log.a.warn("NTSB: Invalid subtitles appended"); else {
+                    var startTime = timescaledStart / timescale, endTime = null != timescaledEnd ? timescaledEnd / timescale : void 0, cues = parseTextTrackToCues(type, dataString, this.timestampOffset, language);
+                    if (0 < cues.length) {
+                        var firstCue = cues[0], currentCues = this._track.cues;
+ // NOTE(compat): cleanup all current cues if the newly added
+                        // ones are in the past. this is supposed to fix an issue on
+                        // IE/Edge.
+                                                0 < currentCues.length && firstCue.startTime < currentCues[currentCues.length - 1].startTime && this._remove(firstCue.startTime, Infinity);
+                        for (var i = 0; i < cues.length; i++) this._track.addCue(cues[i]);
+                        this.buffered.insert(startTime, null != endTime ? endTime : cues[cues.length - 1].endTime);
+                    } else null != endTime && this.buffered.insert(startTime, endTime);
+                }
+            }
+            /**
+   * @param {Number} from
+   * @param {Number} to
+   */ , _proto._remove = function _remove(from, to) {
+                log.a.debug("NTSB: Removing native text track data", from, to);
+                var track = this._track, cues = track.cues;
+                if (null != cues) for (var i = cues.length - 1; 0 <= i; i--) {
+                    var cue = cues[i], startTime = cue.startTime, endTime = cue.endTime;
+                    from <= startTime && startTime <= to && endTime <= to && removeCue(track, cue);
+                }
+                this.buffered.remove(from, to);
+            }, _proto._abort = function _abort() {
+                log.a.debug("NTSB: Aborting native text track SourceBuffer"), this._remove(0, Infinity);
+                var _trackElement = this._trackElement, _videoElement = this._videoElement;
+                if (_trackElement && _videoElement && _videoElement.hasChildNodes()) try {
+                    _videoElement.removeChild(_trackElement);
+                } catch (e) {
+                    log.a.warn("NTSB: Can't remove track element from the video");
+                }
+                this._track && (this._track.mode = "disabled"), this._trackElement && (this._trackElement.innerHTML = "");
+            }, NativeTextSourceBuffer;
+        }(abstract_source_buffer.a);
+        // CONCATENATED MODULE: ./src/core/source_buffers/text/native/index.ts
+        /**
+ * Copyright 2015 CANAL+ Group
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+        /**
+ * /!\ This file is feature-switchable.
+ * It always should be imported through the `features` object.
+ */
+        /* harmony default export */        __webpack_exports__.default = native_text_source_buffer_NativeTextSourceBuffer;
+    }, 
+    /* 155 */
+    /***/ function(module, __webpack_exports__, __webpack_require__) {
+        "use strict";
+        __webpack_require__.r(__webpack_exports__);
         // EXTERNAL MODULE: ./src/compat/is_vtt_cue.ts
-        var is_vtt_cue = __webpack_require__(125), get_cue_blocks = __webpack_require__(89), parse_cue_block = __webpack_require__(104), utils = __webpack_require__(50), array_includes = __webpack_require__(12);
+        var is_vtt_cue = __webpack_require__(125), get_cue_blocks = __webpack_require__(89), parse_cue_block = __webpack_require__(105), utils = __webpack_require__(50), array_includes = __webpack_require__(12);
         // EXTERNAL MODULE: ./src/parsers/texttracks/webvtt/get_cue_blocks.ts
                 // CONCATENATED MODULE: ./src/parsers/texttracks/webvtt/native/set_settings_on_cue.ts
         /**
@@ -23374,12 +23635,12 @@ object-assign
             return cues;
         };
         /***/    }, 
-    /* 155 */
+    /* 156 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
         __webpack_require__.r(__webpack_exports__);
         // EXTERNAL MODULE: ./node_modules/object-assign/index.js
-        var object_assign = __webpack_require__(9), object_assign_default = /* */ __webpack_require__.n(object_assign), array_find = __webpack_require__(11), get_parameters = __webpack_require__(91), get_parent_elements_by_tag_name = __webpack_require__(62), get_styling = __webpack_require__(28), nodes = __webpack_require__(48), get_time_delimiters = __webpack_require__(105), regexps = __webpack_require__(18), SPAN_LEVEL_ATTRIBUTES = [ "color", "direction", "display", "fontFamily", "fontSize", "fontStyle", "fontWeight", "textDecoration", "textOutline", "unicodeBidi", "visibility", "wrapOption" ];
+        var object_assign = __webpack_require__(9), object_assign_default = /* */ __webpack_require__.n(object_assign), array_find = __webpack_require__(11), get_parameters = __webpack_require__(91), get_parent_elements_by_tag_name = __webpack_require__(62), get_styling = __webpack_require__(28), nodes = __webpack_require__(48), get_time_delimiters = __webpack_require__(104), regexps = __webpack_require__(18), SPAN_LEVEL_ATTRIBUTES = [ "color", "direction", "display", "fontFamily", "fontSize", "fontStyle", "fontWeight", "textDecoration", "textOutline", "unicodeBidi", "visibility", "wrapOption" ];
         /**
  * Translate a color indicated in TTML-style to a CSS-style color.
  * @param {string} color
@@ -23844,151 +24105,6 @@ object-assign
             return ret;
         };
         /***/    }, 
-    /* 156 */
-    /***/ function(module, __webpack_exports__, __webpack_require__) {
-        "use strict";
-        __webpack_require__.r(__webpack_exports__);
-        // EXTERNAL MODULE: ./src/compat/add_text_track.ts
-        var add_text_track = __webpack_require__(124), log = __webpack_require__(0), abstract_source_buffer = __webpack_require__(63), features = __webpack_require__(10);
-        // EXTERNAL MODULE: ./src/log.ts + 1 modules
-                // CONCATENATED MODULE: ./src/core/source_buffers/text/native/parsers.ts
-        /**
- * Copyright 2015 CANAL+ Group
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-        /**
- * Convert text track data into timed VTT Cues.
- * @param {string} type - Text track format wanted
- * @param {string} data - Text track data
- * @param {Number} timestampOffset - offset to apply to every timed text
- * @param {string} [language] - language of the text tracks
- * @returns {Array.<VTTCue>}
- * @throws Error - Throw if no parser is found for the given type
- */
-        function parseTextTrackToCues(type, data, timestampOffset, language) {
-            log.a.debug("NTSB: Finding parser for native text tracks:", type);
-            var parser = features.a.nativeTextTracksParsers[type];
-            if (!parser) throw new Error("no parser found for the given text track");
-            log.a.debug("NTSB: Parser found, parsing...");
-            var parsed = parser(data, timestampOffset, language);
-            return log.a.debug("NTSB: Parsed successfully!", parsed), parsed;
-        }
-        // CONCATENATED MODULE: ./src/core/source_buffers/text/native/native_text_source_buffer.ts
-                function _inheritsLoose(subClass, superClass) {
-            subClass.prototype = Object.create(superClass.prototype), (subClass.prototype.constructor = subClass).__proto__ = superClass;
-        }
-        /**
- * Copyright 2015 CANAL+ Group
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-        /**
- * SourceBuffer to display TextTracks in a <track> element, in the given
- * video element.
- * @class NativeTextSourceBuffer
- * @extends AbstractSourceBuffer
- */        var native_text_source_buffer_NativeTextSourceBuffer = 
-        /* */
-        function(_AbstractSourceBuffer) {
-            /**
-   * @param {HTMLMediaElement} videoElement
-   * @param {Boolean} hideNativeSubtitle
-   */
-            function NativeTextSourceBuffer(videoElement, hideNativeSubtitle) {
-                var _this;
-                log.a.debug("NTSB: Creating native text track SourceBuffer"), _this = _AbstractSourceBuffer.call(this) || this;
-                var _addTextTrack = Object(add_text_track.a)(videoElement, hideNativeSubtitle), track = _addTextTrack.track, trackElement = _addTextTrack.trackElement;
-                return _this._videoElement = videoElement, _this._track = track, _this._trackElement = trackElement, 
-                _this;
-            }
-            /**
-   * Append text tracks.
-   * @param {Object} data
-   */            _inheritsLoose(NativeTextSourceBuffer, _AbstractSourceBuffer);
-            var _proto = NativeTextSourceBuffer.prototype;
-            return _proto._append = function _append(data) {
-                log.a.debug("NTSB: Appending new native text tracks", data);
-                var timescale = data.timescale, timescaledStart = data.start, timescaledEnd = data.end, dataString = data.data, type = data.type, language = data.language;
-                if (null != timescaledEnd && timescaledEnd - timescaledStart <= 0) 
-                // this is accepted for error resilience, just skip that case.
-                log.a.warn("NTSB: Invalid subtitles appended"); else {
-                    var startTime = timescaledStart / timescale, endTime = null != timescaledEnd ? timescaledEnd / timescale : void 0, cues = parseTextTrackToCues(type, dataString, this.timestampOffset, language);
-                    if (0 < cues.length) {
-                        var firstCue = cues[0], currentCues = this._track.cues;
- // NOTE(compat): cleanup all current cues if the newly added
-                        // ones are in the past. this is supposed to fix an issue on
-                        // IE/Edge.
-                                                0 < currentCues.length && firstCue.startTime < currentCues[currentCues.length - 1].startTime && this._remove(firstCue.startTime, Infinity);
-                        for (var i = 0; i < cues.length; i++) this._track.addCue(cues[i]);
-                        this.buffered.insert(startTime, null != endTime ? endTime : cues[cues.length - 1].endTime);
-                    } else null != endTime && this.buffered.insert(startTime, endTime);
-                }
-            }
-            /**
-   * @param {Number} from
-   * @param {Number} to
-   */ , _proto._remove = function _remove(from, to) {
-                log.a.debug("NTSB: Removing native text track data", from, to);
-                var track = this._track, cues = track.cues;
-                if (null != cues) for (var i = cues.length - 1; 0 <= i; i--) {
-                    var cue = cues[i], startTime = cue.startTime, endTime = cue.endTime;
-                    from <= startTime && startTime <= to && endTime <= to && track.removeCue(cue);
-                }
-                this.buffered.remove(from, to);
-            }, _proto._abort = function _abort() {
-                log.a.debug("NTSB: Aborting native text track SourceBuffer"), this._remove(0, Infinity);
-                var _trackElement = this._trackElement, _videoElement = this._videoElement;
-                if (_trackElement && _videoElement && _videoElement.hasChildNodes()) try {
-                    _videoElement.removeChild(_trackElement);
-                } catch (e) {
-                    log.a.warn("NTSB: Can't remove track element from the video");
-                }
-                this._track && (this._track.mode = "disabled"), this._trackElement && (this._trackElement.innerHTML = "");
-            }, NativeTextSourceBuffer;
-        }(abstract_source_buffer.a);
-        // CONCATENATED MODULE: ./src/core/source_buffers/text/native/index.ts
-        /**
- * Copyright 2015 CANAL+ Group
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-        /**
- * /!\ This file is feature-switchable.
- * It always should be imported through the `features` object.
- */
-        /* harmony default export */        __webpack_exports__.default = native_text_source_buffer_NativeTextSourceBuffer;
-    }, 
     /* 157 */
     /***/ function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
@@ -24057,7 +24173,7 @@ object-assign
         "use strict";
         __webpack_require__.r(__webpack_exports__);
         // EXTERNAL MODULE: ./node_modules/object-assign/index.js
-        var object_assign = __webpack_require__(9), object_assign_default = /* */ __webpack_require__.n(object_assign), make_vtt_cue = __webpack_require__(90), is_vtt_cue = __webpack_require__(125), array_find = __webpack_require__(11), get_parameters = __webpack_require__(91), get_parent_elements_by_tag_name = __webpack_require__(62), get_styling = __webpack_require__(28), get_time_delimiters = __webpack_require__(105), nodes = __webpack_require__(48), regexps = __webpack_require__(18), WANTED_STYLE_ATTRIBUTES = [ "extent", "writingMode", "origin", "align" ], TEXT_ALIGN_TO_LIGN_ALIGN = {
+        var object_assign = __webpack_require__(9), object_assign_default = /* */ __webpack_require__.n(object_assign), make_vtt_cue = __webpack_require__(90), is_vtt_cue = __webpack_require__(125), array_find = __webpack_require__(11), get_parameters = __webpack_require__(91), get_parent_elements_by_tag_name = __webpack_require__(62), get_styling = __webpack_require__(28), get_time_delimiters = __webpack_require__(104), nodes = __webpack_require__(48), regexps = __webpack_require__(18), WANTED_STYLE_ATTRIBUTES = [ "extent", "writingMode", "origin", "align" ], TEXT_ALIGN_TO_LIGN_ALIGN = {
             left: "start",
             center: "center",
             right: "end",
@@ -24293,7 +24409,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return merge;
         });
-        /* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5), _util_isScheduler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(38), _operators_mergeAll__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(103), _fromArray__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(33);
+        /* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5), _util_isScheduler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(38), _operators_mergeAll__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(100), _fromArray__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(33);
         /* harmony import */        
         /** PURE_IMPORTS_START _Observable,_util_isScheduler,_operators_mergeAll,_fromArray PURE_IMPORTS_END */
         function merge() {
@@ -24675,7 +24791,7 @@ object-assign
         /* harmony export (binding) */        __webpack_require__.d(__webpack_exports__, "a", function() {
             return isKnownError;
         });
-        /* harmony import */ var _error_codes__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
+        /* harmony import */ var _error_codes__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(21);
         /**
  * Copyright 2015 CANAL+ Group
  *

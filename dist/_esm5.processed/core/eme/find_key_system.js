@@ -207,7 +207,7 @@ export default function getMediaKeySystemAccess(mediaElement, keySystemsConfigs,
             }
             return arr.concat(ksType);
         }, []);
-        return Observable.create(function (obs) {
+        return new Observable(function (obs) {
             var disposed = false;
             var sub;
             /**

@@ -63,4 +63,7 @@ export declare enum ProberStatus {
     Unknown = 1,
     Supported = 2
 }
+export declare type ICapabilities = Array<(string | {
+    [key: string]: ICapabilities;
+})>;
 export {};

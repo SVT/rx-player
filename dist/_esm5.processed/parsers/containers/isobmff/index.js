@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 export { getMDHDTimescale, getPlayReadyKIDFromPrivateData, getTrackFragmentDecodeTime, getDurationFromTrun, getSegmentsFromSidx, patchPssh, } from "./utils";
-export { getMDAT, getMDIA, getTRAF, } from "./read";
+export { getBox, getBoxContent, getBoxOffsets, getMDAT, getMDIA, getTRAF, } from "./read";

@@ -201,7 +201,7 @@ function getStalledStatus(prevTimings, currentTimings, withMediaSource) {
  */
 function createClock(mediaElement, _a) {
     var withMediaSource = _a.withMediaSource;
-    return Observable.create(function (obs) {
+    return new Observable(function (obs) {
         var lastTimings = objectAssign(getMediaInfos(mediaElement, "init"), { stalled: null });
         /**
          * Emit timings sample.

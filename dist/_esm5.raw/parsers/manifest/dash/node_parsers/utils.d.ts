@@ -18,12 +18,6 @@ export interface IScheme {
     value?: string;
 }
 /**
- * Parse MPD string attributes.
- * @param {string} str
- * @returns {string} - the same string
- */
-declare function parseString(str: string): string;
-/**
  * Parse MPD boolean attributes.
  * @param {string} str
  * @returns {Boolean}
@@ -48,12 +42,6 @@ declare function parseDateTime(str: string): number;
  */
 declare function parseDuration(date: string): number;
 /**
- * Parse MPD ratio attributes.
- * @param {string} str
- * @returns {string}
- */
-declare function parseRatio(str: string): string;
-/**
  * Parse MPD byterange attributes into arrays of two elements: the start and
  * the end.
  * @param {string} str
@@ -65,4 +53,4 @@ declare function parseByteRange(str: string): [number, number] | null;
  * @returns {Object}
  */
 declare function parseScheme(root: Element): IScheme;
-export { parseBoolean, parseByteRange, parseDateTime, parseDuration, parseIntOrBoolean, parseRatio, parseScheme, parseString, };
+export { parseBoolean, parseByteRange, parseDateTime, parseDuration, parseIntOrBoolean, parseScheme, };

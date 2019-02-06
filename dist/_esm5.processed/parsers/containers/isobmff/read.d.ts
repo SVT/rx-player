@@ -14,6 +14,36 @@
  * limitations under the License.
  */
 /**
+ * Returns the content of a box based on its name.
+ * `null` if not found.
+ * /!\ does not work with UUID boxes
+ * @param {Uint8Array} buf - the isobmff structure
+ * @param {Number} boxName - the 4-letter 'name' of the box (e.g. 'sidx' or
+ * 'moov'), hexa encoded
+ * @returns {UInt8Array|null}
+ */
+declare function getBoxContent(buf: Uint8Array, boxName: number): Uint8Array | null;
+/**
+ * Returns an ISOBMFF box based on its name.
+ * `null` if not found.
+ * /!\ does not work with UUID boxes
+ * @param {Uint8Array} buf - the isobmff structure
+ * @param {Number} boxName - the 4-letter 'name' of the box (e.g. 'sidx' or
+ * 'moov'), hexa encoded
+ * @returns {UInt8Array|null}
+ */
+declare function getBox(buf: Uint8Array, boxName: number): Uint8Array | null;
+/**
+ * Returns start and end offset for a given box.
+ * `null` if not found.
+ * /!\ does not work with UUID boxes
+ * @param {Uint8Array} buf - the isobmff structure
+ * @param {Number} boxName - the 4-letter 'name' of the box (e.g. 'sidx' or
+ * 'moov'), hexa encoded
+ * @returns {Array.<number>|null}
+ */
+declare function getBoxOffsets(buf: Uint8Array, boxName: number): [number, number] | null;
+/**
  * Returns TRAF Box from the whole ISOBMFF File.
  * Returns null if not found.
  * @param {Uint8Array} buffer
@@ -34,4 +64,4 @@ declare function getMDAT(buf: Uint8Array): Uint8Array | null;
  * @returns {Uint8Array|null}
  */
 declare function getMDIA(buf: Uint8Array): Uint8Array | null;
-export { getTRAF, getMDAT, getMDIA, };
+export { getBox, getBoxContent, getBoxOffsets, getTRAF, getMDAT, getMDIA, };

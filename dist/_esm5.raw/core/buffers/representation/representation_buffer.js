@@ -77,7 +77,7 @@ export default function RepresentationBuffer(_a) {
     var sourceBufferWaitingQueue = new SimpleSet();
     var status$ = observableCombineLatest(clock$, wantedBufferAhead$, terminate$.pipe(take(1), mapTo(true), startWith(false)), finishedDownloadQueue$.pipe(startWith(undefined))).pipe(map(function getCurrentStatus(_a) {
         var timing = _a[0], bufferGoal = _a[1], terminate = _a[2];
-        var buffered = timing.buffered;
+        var buffered = queuedSourceBuffer.getBuffered();
         segmentBookkeeper.synchronizeBuffered(buffered);
         var neededRange = getWantedRange(period, buffered, timing, bufferGoal, paddings);
         var discontinuity = !timing.stalled || !manifest.isLive ?

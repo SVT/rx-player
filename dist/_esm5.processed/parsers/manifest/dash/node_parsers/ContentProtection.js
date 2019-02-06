@@ -21,7 +21,6 @@
 export default function parseContentProtection(root) {
     var schemeIdUri;
     var value;
-    var keyId;
     for (var i = 0; i < root.attributes.length; i++) {
         var attribute = root.attributes[i];
         switch (attribute.name) {
@@ -31,8 +30,6 @@ export default function parseContentProtection(root) {
             case "value":
                 value = attribute.value;
                 break;
-            case "cenc:default_KID":
-                keyId = attribute.value.toString().split("-").join("").toUpperCase();
         }
     }
     // TODO Take systemId from PSSH?
@@ -42,9 +39,5 @@ export default function parseContentProtection(root) {
     //     pssh = atob(child.textContent);
     //   }
     // }
-    return {
-        schemeIdUri: schemeIdUri,
-        value: value,
-        keyId: keyId,
-    };
+    return { schemeIdUri: schemeIdUri, value: value };
 }

@@ -26,8 +26,8 @@ export default function parseInitialization(root) {
         switch (attribute.name) {
             case "range":
                 {
-                    var range = parseByteRange(attribute.value) || undefined;
-                    if (!range) {
+                    var range = parseByteRange(attribute.value);
+                    if (range == null) {
                         log.warn("DASH: invalid range (\"" + attribute.value + "\")");
                     }
                     else {

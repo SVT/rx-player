@@ -36,7 +36,6 @@ import { BehaviorSubject, combineLatest as observableCombineLatest, concat as ob
 import { catchError, distinctUntilChanged, filter, map, mapTo, mergeMapTo, publish, share, skipWhile, startWith, switchMapTo, take, takeUntil, } from "rxjs/operators";
 import config from "../../config";
 import log from "../../log";
-import assert from "../../utils/assert";
 import EventEmitter, { fromEvent, } from "../../utils/event_emitter";
 import noop from "../../utils/noop";
 import PPromise from "../../utils/promise";
@@ -71,7 +70,7 @@ var Player = /** @class */ (function (_super) {
         // Workaround to support Firefox autoplay on FF 42.
         // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1194624
         videoElement.preload = "auto";
-        _this.version = /*PLAYER_VERSION*/ "3.10.2";
+        _this.version = /*PLAYER_VERSION*/ "3.10.3";
         _this.log = log;
         _this.state = "STOPPED";
         _this.videoElement = videoElement;
@@ -1591,10 +1590,6 @@ var Player = /** @class */ (function (_super) {
      */
     Player.prototype._priv_onBitrateEstimationChange = function (_a) {
         var type = _a.type, bitrate = _a.bitrate;
-        if (false) {
-            assert(type != null);
-            assert(bitrate != null);
-        }
         this._priv_triggerContentEvent("bitrateEstimation", { type: type, bitrate: bitrate });
     };
     /**
@@ -1675,5 +1670,5 @@ var Player = /** @class */ (function (_super) {
     };
     return Player;
 }(EventEmitter));
-Player.version = /*PLAYER_VERSION*/ "3.10.2";
+Player.version = /*PLAYER_VERSION*/ "3.10.3";
 export default Player;

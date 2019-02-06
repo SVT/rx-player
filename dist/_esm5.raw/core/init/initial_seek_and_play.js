@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { concat as observableConcat, of as observableOf, ReplaySubject, } from "rxjs";
-import { catchError, filter, mapTo, mergeMap, multicast, refCount, take, tap, } from "rxjs/operators";
+import { concat as observableConcat, of as observableOf, } from "rxjs";
+import { catchError, filter, mapTo, mergeMap, shareReplay, take, tap, } from "rxjs/operators";
 import { events, play$, shouldValidateMetadata } from "../../compat";
 import log from "../../log";
 // XXX TODO Are we sure we shouldn't use whenLoadedMetadata here?
@@ -81,11 +81,7 @@ export default function seekAndLoadOnMediaEvents(clock$, mediaElement, startTime
         log.info("Init: Set initial time", startTime);
         mediaElement.currentTime = typeof startTime === "function" ?
             startTime() : startTime;
-    }), 
-    // equivalent to a sane shareReplay:
-    // https://github.com/ReactiveX/rxjs/issues/3336
-    // XXX TODO Replace it when that issue is resolved
-    multicast(function () { return new ReplaySubject(1); }), refCount());
+    }), shareReplay({ refCount: true }));
     var load$ = seek$.pipe(mergeMap(function () {
         return canPlay(clock$, mediaElement).pipe(tap(function () { return log.info("Init: Can begin to play content"); }), mergeMap(function (evt) {
             if (evt === "can-play") {
@@ -96,10 +92,6 @@ export default function seekAndLoadOnMediaEvents(clock$, mediaElement, startTime
             }
             return observableOf(evt);
         }));
-    }), 
-    // equivalent to a sane shareReplay:
-    // https://github.com/ReactiveX/rxjs/issues/3336
-    // XXX TODO Replace it when that issue is resolved
-    multicast(function () { return new ReplaySubject(1); }), refCount());
+    }), shareReplay({ refCount: true }));
     return { seek$: seek$, load$: load$ };
 }

@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface IStyleElement {
-    className?: string;
-    isGlobalStyle: boolean;
-    styleContent: string;
+export interface IStyleElements {
+    [className: string]: string;
 }
 /**
  *
  * Parse style element from WebVTT.
  * @param {Array.<string>} styleBlock
- * @return {Array.<Object>} styleElements
+ * @param {Object} baseStyleElements
+ * @return {Array.<Object>} classes
  */
-export default function parseStyleBlock(styleBlock: string[]): IStyleElement[];
+export default function parseStyleBlocks(styleBlocks: string[][]): {
+    classes: IStyleElements;
+    global: string;
+};

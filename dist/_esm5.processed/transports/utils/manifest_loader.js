@@ -36,7 +36,7 @@ var manifestPreLoader = function (options) { return function (url) {
     if (!customManifestLoader) {
         return regularManifestLoader(url, ignoreProgressEvents);
     }
-    return Observable.create(function (obs) {
+    return new Observable(function (obs) {
         var hasFinished = false;
         var hasFallbacked = false;
         /**

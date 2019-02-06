@@ -161,7 +161,7 @@ var QueuedSourceBuffer = /** @class */ (function () {
      */
     QueuedSourceBuffer.prototype._addToQueue = function (order) {
         var _this = this;
-        return Observable.create(function (obs) {
+        return new Observable(function (obs) {
             var shouldRestartQueue = _this._queue.length === 0 && _this._currentOrder == null;
             var queueItem;
             var subject = new Subject();

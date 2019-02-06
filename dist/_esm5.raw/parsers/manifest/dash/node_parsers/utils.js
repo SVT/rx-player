@@ -13,21 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// XML-Schema
-/* tslint:disable:max-line-length */
-// <http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd>
-/* tslint:enable:max-line-length */
-import assert from "../../../../utils/assert";
 var iso8601Duration = /^P(([\d.]*)Y)?(([\d.]*)M)?(([\d.]*)D)?T?(([\d.]*)H)?(([\d.]*)M)?(([\d.]*)S)?/;
 var rangeRe = /([0-9]+)-([0-9]+)/;
-/**
- * Parse MPD string attributes.
- * @param {string} str
- * @returns {string} - the same string
- */
-function parseString(str) {
-    return str;
-}
 /**
  * Parse MPD boolean attributes.
  * @param {string} str
@@ -68,21 +55,15 @@ function parseDuration(date) {
         return 0;
     }
     var match = iso8601Duration.exec(date);
-    assert(!!match, date + " is not a valid ISO8601 duration");
+    if (match == null) {
+        throw new Error(date + " is not a valid ISO8601 duration");
+    }
     return (parseFloat(match[2] || "0") * 365 * 24 * 60 * 60 +
         parseFloat(match[4] || "0") * 30 * 24 * 60 * 60 + // not precise +
         parseFloat(match[6] || "0") * 24 * 60 * 60 +
         parseFloat(match[8] || "0") * 60 * 60 +
         parseFloat(match[10] || "0") * 60 +
         parseFloat(match[12] || "0"));
-}
-/**
- * Parse MPD ratio attributes.
- * @param {string} str
- * @returns {string}
- */
-function parseRatio(str) {
-    return str;
 }
 /**
  * Parse MPD byterange attributes into arrays of two elements: the start and
@@ -122,4 +103,4 @@ function parseScheme(root) {
         value: value,
     };
 }
-export { parseBoolean, parseByteRange, parseDateTime, parseDuration, parseIntOrBoolean, parseRatio, parseScheme, parseString, };
+export { parseBoolean, parseByteRange, parseDateTime, parseDuration, parseIntOrBoolean, parseScheme, };

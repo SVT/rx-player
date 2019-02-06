@@ -102,7 +102,7 @@ export default EventEmitter;
  * @returns {Observable}
  */
 export function fromEvent(target, eventName) {
-    return Observable.create(function (obs) {
+    return new Observable(function (obs) {
         function handler(event) {
             obs.next(event);
         }

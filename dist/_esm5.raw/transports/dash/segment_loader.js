@@ -69,7 +69,7 @@ var segmentPreLoader = function (customSegmentLoader) { return function (_a) {
     if (!customSegmentLoader) {
         return regularSegmentLoader(args);
     }
-    return Observable.create(function (obs) {
+    return new Observable(function (obs) {
         var hasFinished = false;
         var hasFallbacked = false;
         /**

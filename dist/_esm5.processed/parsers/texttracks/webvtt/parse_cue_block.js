@@ -93,9 +93,6 @@ export default function parseCueBlock(cueLines, timeOffset) {
         timeString = cueLines[0];
         payload = cueLines.slice(1, cueLines.length);
     }
-    if (!timeString) {
-        return null;
-    }
     var timeAndSettings = parseTimeAndSettings(timeString);
     if (!timeAndSettings) {
         return null;

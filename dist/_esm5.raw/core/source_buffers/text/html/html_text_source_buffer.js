@@ -154,6 +154,7 @@ var HTMLTextSourceBuffer = /** @class */ (function (_super) {
      */
     HTMLTextSourceBuffer.prototype._abort = function () {
         log.debug("HTSB: Aborting html text track SourceBuffer");
+        this._remove(0, Infinity);
         this._destroy$.next();
         this._destroy$.complete();
         safelyRemoveChild(this._textTrackElement, this._currentElement);

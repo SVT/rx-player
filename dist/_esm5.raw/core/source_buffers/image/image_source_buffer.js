@@ -62,6 +62,7 @@ var ImageSourceBuffer = /** @class */ (function (_super) {
     };
     ImageSourceBuffer.prototype._abort = function () {
         log.debug("ImageSourceBuffer: aborting image SourceBuffer");
+        this._remove(0, Infinity);
     };
     return ImageSourceBuffer;
 }(AbstractSourceBuffer));

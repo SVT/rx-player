@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { parseRatio } from "./utils";
 /**
  * Parse a "ContentComponent" Element in a DASH MPD.
  * @param {Element} root
@@ -34,7 +33,7 @@ export default function parseContentComponent(root) {
                 ret.contentType = attribute.value;
                 break;
             case "par":
-                ret.par = parseRatio(attribute.value);
+                ret.par = attribute.value;
                 break;
         }
     }

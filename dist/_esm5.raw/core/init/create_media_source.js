@@ -88,7 +88,7 @@ function resetMediaSource(mediaElement, mediaSource, mediaSourceURL) {
  * @returns {Observable}
  */
 function createMediaSource(mediaElement) {
-    return Observable.create(function (observer) {
+    return new Observable(function (observer) {
         if (!MediaSource_) {
             throw new MediaError("MEDIA_SOURCE_NOT_SUPPORTED", null, true);
         }

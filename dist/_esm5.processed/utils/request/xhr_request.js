@@ -39,7 +39,7 @@ function request(options) {
         timeout: options.timeout == null ?
             DEFAULT_REQUEST_TIMEOUT : options.timeout,
     };
-    return Observable.create(function (obs) {
+    return new Observable(function (obs) {
         var url = requestOptions.url, headers = requestOptions.headers, responseType = requestOptions.responseType, timeout = requestOptions.timeout;
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);

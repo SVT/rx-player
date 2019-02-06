@@ -13,46 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import createDefaultStyleElements from "./create_default_style_elements";
 /**
  *
  * Parse style element from WebVTT.
  * @param {Array.<string>} styleBlock
- * @return {Array.<Object>} styleElements
+ * @param {Object} baseStyleElements
+ * @return {Array.<Object>} classes
  */
-export default function parseStyleBlock(styleBlock) {
-    var styleElements = [];
-    var index = 1;
-    var classNames = [];
-    if (styleBlock.length < 2) {
-        return [];
-    }
-    if (styleBlock[1].match(/::cue {/)) {
-        classNames.push({ isGlobalStyle: true });
-        index++;
-    }
-    else {
-        var cueClassLine = void 0;
-        while (styleBlock[index] &&
-            (cueClassLine = styleBlock[index].match(/::cue\(\.?(.*?)\)(?:,| {)/))) {
-            classNames.push({
-                className: cueClassLine[1],
-                isGlobalStyle: false,
-            });
-            index++;
+export default function parseStyleBlocks(styleBlocks) {
+    var classes = createDefaultStyleElements();
+    var global = "";
+    styleBlocks.forEach(function (styleBlock) {
+        if (styleBlock.length >= 2) {
+            var _loop_1 = function (index) {
+                var line = styleBlock[index];
+                if (line.match(/::cue {/)) {
+                    line = styleBlock[++index];
+                    while (line && (!(line.match(/}/) || line.length === 0))) {
+                        global += line;
+                        line = styleBlock[++index];
+                    }
+                }
+                else {
+                    var classNames = [];
+                    var cueClassLine = void 0;
+                    while (line && (cueClassLine = line.match(/::cue\(\.?(.*?)\)(?:,| {)/))) {
+                        classNames.push(cueClassLine[1]);
+                        line = styleBlock[++index];
+                    }
+                    var styleContent_1 = "";
+                    while (line && (!(line.match(/}/) || line.length === 0))) {
+                        styleContent_1 += line;
+                        line = styleBlock[++index];
+                    }
+                    classNames.forEach(function (className) {
+                        var styleElement = classes[className];
+                        if (!styleElement) {
+                            classes[className] = styleContent_1;
+                        }
+                        else {
+                            classes[className] += styleContent_1;
+                        }
+                    });
+                }
+                out_index_1 = index;
+            };
+            var out_index_1;
+            for (var index = 1; index < styleBlock.length; index++) {
+                _loop_1(index);
+                index = out_index_1;
+            }
         }
-    }
-    var styleContent = "";
-    while (styleBlock[index] &&
-        (!(styleBlock[index].match(/}/) || styleBlock[index].length === 0))) {
-        styleContent += styleBlock[index];
-        index++;
-    }
-    classNames.forEach(function (name) {
-        styleElements.push({
-            className: name.className,
-            isGlobalStyle: name.isGlobalStyle,
-            styleContent: styleContent.replace(/\s/g, ""),
-        });
     });
-    return styleElements;
+    return { classes: classes, global: global };
 }

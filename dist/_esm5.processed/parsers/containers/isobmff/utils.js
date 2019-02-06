@@ -171,6 +171,7 @@ function getDefaultDurationFromTFHDInTRAF(traf) {
     }
     var pos = index + /* size */ 4 + /* name */ 4 + /* version */ 1;
     var flags = be3toi(traf, pos);
+    pos += 3;
     var hasBaseDataOffset = flags & 0x000001;
     var hasSampleDescriptionIndex = flags & 0x000002;
     var hasDefaultSampleDuration = flags & 0x000008;
@@ -196,7 +197,7 @@ function getDurationFromTrun(buffer) {
     if (!traf) {
         return -1;
     }
-    var index = findBox(traf, 0x7472756e /* tfdt */);
+    var index = findBox(traf, 0x7472756e /* trun */);
     if (index === -1) {
         return -1;
     }
@@ -212,10 +213,9 @@ function getDurationFromTrun(buffer) {
     var defaultDuration = 0;
     if (!hasSampleDuration) {
         defaultDuration = getDefaultDurationFromTFHDInTRAF(traf);
-        if (defaultDuration >= 0) {
-            return defaultDuration;
+        if (defaultDuration < 0) {
+            return -1;
         }
-        return -1;
     }
     var hasDataOffset = flags & 0x000001;
     var hasFirstSampleFlags = flags & 0x000004;

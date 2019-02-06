@@ -26,7 +26,7 @@ import clearElementSrc from "./clear_element_src";
  * @returns {Observable}
  */
 export default function setElementSrc$(mediaElement, url) {
-    return Observable.create(function (observer) {
+    return new Observable(function (observer) {
         log.info("Setting URL to Element", url, mediaElement);
         mediaElement.src = url;
         observer.next(undefined);

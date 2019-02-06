@@ -91,7 +91,6 @@ export default function PeriodBuffer(_a) {
         var adaptationBufferClock$ = clock$.pipe(map(function (tick) {
             var buffered = qSourceBuffer.getBuffered();
             return objectAssign({}, tick, {
-                buffered: buffered,
                 bufferGap: getLeftSizeOfRange(buffered, tick.currentTime),
             });
         }));

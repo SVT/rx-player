@@ -15,10 +15,9 @@
  */
 import log from "../../../log";
 import arrayFind from "../../../utils/array_find";
-import assert, { assertInterface, } from "../../../utils/assert";
+import { assertInterface, } from "../../../utils/assert";
 import hashBuffer from "../../../utils/hash_buffer";
 function checkStorage(storage) {
-    assert(storage != null, "no licenseStorage given for keySystem with persistentLicense");
     assertInterface(storage, { save: "function", load: "function" }, "licenseStorage");
 }
 /**
@@ -40,7 +39,9 @@ var PersistedSessionsStore = /** @class */ (function () {
         this._storage = storage;
         try {
             this._entries = this._storage.load();
-            assert(Array.isArray(this._entries));
+            if (!Array.isArray(this._entries)) {
+                this._entries = [];
+            }
         }
         catch (e) {
             log.warn("EME-PSS: Could not get entries from license storage", e);

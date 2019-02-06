@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { getMDAT, getTRAF } from "../../parsers/containers/isobmff";
 export interface IISOBMFFBasicSegment {
     time: number;
     duration: number;
 }
 declare const _default: {
-    getMdat: typeof getMDAT;
-    getTraf: typeof getTRAF;
     /**
      * @param {Uint8Array} traf
      * @returns {Array.<Object>}
@@ -72,7 +69,7 @@ declare const _default: {
         keyIds?: Uint8Array | undefined;
     }[] | undefined): Uint8Array;
     /**
-     * Add decodeTime info in a segment (tfdt box)
+     * Patch ISOBMFF Segment downloaded in Smooth Streaming.
      * @param {Uint8Array} segment
      * @param {Number} decodeTime
      * @return {Uint8Array}

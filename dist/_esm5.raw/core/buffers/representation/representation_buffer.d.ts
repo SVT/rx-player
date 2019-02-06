@@ -20,7 +20,6 @@ import { QueuedSourceBuffer } from "../../source_buffers";
 import SegmentBookkeeper from "../segment_bookkeeper";
 import { IRepresentationBufferEvent } from "../types";
 export interface IRepresentationBufferClockTick {
-    buffered: TimeRanges;
     currentTime: number;
     liveGap?: number;
     stalled: object | null;

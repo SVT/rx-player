@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { IVTTHTMLCue } from "./to_html";
 export interface IVTTHTMLCue {
     start: number;
     end: number;
@@ -27,9 +28,9 @@ export interface IVTTHTMLCue {
  * Global style is parsed and applied to div element.
  * Specific style is parsed and applied to class element.
  *
- * @param {string} text
- * @param {Number} timeOffset
- * @return {Array.<Object>}
  * @throws Error - Throws if the given WebVTT string is invalid.
+ * @param {string} text - The whole webvtt subtitles to parse
+ * @param {Number} timeOffset - Offset to add to start and end times, in seconds
+ * @return {Array.<Object>}
  */
 export default function parseWebVTT(text: string, timeOffset: number): IVTTHTMLCue[];

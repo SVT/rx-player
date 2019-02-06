@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-interface IHTMLCue {
-    start: number;
-    end: number;
-    element: HTMLElement;
-}
+import { IHTMLCue } from "./types";
 /**
  * Manage the buffer of the HTML text Sourcebuffer.
  * Allows to add, remove and recuperate cues at given times.
@@ -80,4 +76,3 @@ export default class TextBufferManager {
      */
     insert(cues: IHTMLCue[], start: number, end: number): void;
 }
-export {};

@@ -16,7 +16,6 @@
 export interface IParsedContentProtection {
     schemeIdUri?: string;
     value?: string;
-    keyId?: string;
 }
 /**
  * Parse the "ContentProtection" node of a MPD.

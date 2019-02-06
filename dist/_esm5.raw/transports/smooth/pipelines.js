@@ -18,6 +18,7 @@ import { map } from "rxjs/operators";
 import features from "../../features";
 import log from "../../log";
 import Manifest from "../../manifest";
+import { getMDAT } from "../../parsers/containers/isobmff";
 import createSmoothManifestParser from "../../parsers/manifest/smooth";
 import assert from "../../utils/assert";
 import request from "../../utils/request";
@@ -28,7 +29,7 @@ import extractTimingsInfos from "./extract_timings_infos";
 import mp4Utils from "./mp4_utils";
 import generateSegmentLoader from "./segment_loader";
 import { extractISML, extractToken, replaceToken, resolveManifest, } from "./utils";
-var patchSegment = mp4Utils.patchSegment, getMdat = mp4Utils.getMdat;
+var patchSegment = mp4Utils.patchSegment;
 var WSX_REG = /\.wsx?(\?token=\S+)?/;
 /**
  * @param {Object} adaptation
@@ -231,7 +232,7 @@ export default function (options) {
                 else {
                     throw new Error("could not find a text-track parser for the type " + mimeType);
                 }
-                var mdat = getMdat(parsedResponse);
+                var mdat = getMDAT(parsedResponse);
                 _sdData = stringFromUTF8(mdat);
             }
             else {

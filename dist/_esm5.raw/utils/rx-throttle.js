@@ -42,7 +42,7 @@ export default function throttle(func) {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        return Observable.create(function (obs) {
+        return new Observable(function (obs) {
             var hasErroredOrCompleted = false;
             if (isPending) {
                 hasErroredOrCompleted = true;

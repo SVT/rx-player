@@ -68,7 +68,6 @@ var AbstractSourceBuffer = /** @class */ (function (_super) {
      * Mimic the SourceBuffer _abort_ method.
      */
     AbstractSourceBuffer.prototype.abort = function () {
-        this.remove(0, Infinity);
         this.updating = false;
         this.readyState = "closed";
         this._abort();

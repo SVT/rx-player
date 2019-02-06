@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 import { canPatchISOBMFFSegment } from "../../compat";
-import { getMDAT, getTRAF, } from "../../parsers/containers/isobmff";
+import { getBox, getBoxContent, getBoxOffsets, } from "../../parsers/containers/isobmff";
 import assert from "../../utils/assert";
-import { be2toi, be4toi, be8toi, bytesToHex, bytesToStr, concat, hexToBytes, itobe2, itobe4, itobe8, strToBytes, } from "../../utils/byte_parsing";
+import { be2toi, be4toi, be8toi, bytesToHex, concat, hexToBytes, itobe2, itobe4, itobe8, strToBytes, } from "../../utils/byte_parsing";
 /**
  * Sampling frequencies defined in MPEG-4 Audio.
  * @type {Array.<Number>}
@@ -68,7 +68,7 @@ function boxName(str) {
  * @param {Uint8Array} buff - content of the box
  * @returns {Uint8Array} - The entire ISOBMFF box (length+name+content)
  */
-function Atom(name, buff) {
+function createAtom(name, buff) {
     if (__DEV__) {
         assert(name.length === 4);
     }
@@ -76,6 +76,7 @@ function Atom(name, buff) {
     return concat(itobe4(len), boxName(name), buff);
 }
 /**
+ * Gives the content of a specific UUID with its attached ID
  * @param {Uint8Array} buf
  * @param {Number} id1
  * @param {Number} id2
@@ -83,11 +84,10 @@ function Atom(name, buff) {
  * @param {Number} id4
  * @returns {Uint8Array|undefined}
  */
-function readUuid(buf, id1, id2, id3, id4) {
-    var l = buf.length;
-    var i = 0;
+function getUuidContent(buf, id1, id2, id3, id4) {
     var len;
-    while (i < l) {
+    var l = buf.length;
+    for (var i = 0; i < l; i += len) {
         len = be4toi(buf, i);
         if (be4toi(buf, i + 4) === 0x75756964 /* === "uuid" */ &&
             be4toi(buf, i + 8) === id1 &&
@@ -96,18 +96,17 @@ function readUuid(buf, id1, id2, id3, id4) {
             be4toi(buf, i + 20) === id4) {
             return buf.subarray(i + 24, i + len);
         }
-        i += len;
     }
 }
+/**
+ * @param {string} name
+ * @param {Array.<Uint8Array>} children
+ * @returns {Uint8Array}
+ */
+function createAtomWithChildren(name, children) {
+    return createAtom(name, concat.apply(void 0, children));
+}
 var atoms = {
-    /**
-     * @param {string} name
-     * @param {Array.<Uint8Array>} children
-     * @returns {Uint8Array}
-     */
-    mult: function (name, children) {
-        return Atom(name, concat.apply(null, children));
-    },
     /**
      * @param {string} name - "avc1" or "encv"
      * @param {Number} drefIdx - shall be 1
@@ -127,7 +126,7 @@ var atoms = {
             assert(name === "avc1" || name === "encv", "should be avc1 or encv atom");
             assert(name !== "encv" || sinf instanceof Uint8Array);
         }
-        return Atom(name, concat(6, // 6 bytes reserved
+        return createAtom(name, concat(6, // 6 bytes reserved
         itobe2(drefIdx), 16, // drefIdx + QuickTime reserved, zeroes
         itobe2(width), // size 2 w
         itobe2(height), // size 2 h
@@ -157,7 +156,7 @@ var atoms = {
         var h264Profile = sps[1];
         var h264CompatibleProfile = sps[2];
         var h264Level = sps[3];
-        return Atom("avcC", concat([
+        return createAtom("avcC", concat([
             1,
             h264Profile,
             h264CompatibleProfile,
@@ -172,7 +171,7 @@ var atoms = {
      */
     dref: function (url) {
         // only one description here... FIXME
-        return Atom("dref", concat(7, [1], url));
+        return createAtom("dref", concat(7, [1], url));
     },
     /**
      * @param {Number} stream
@@ -181,7 +180,7 @@ var atoms = {
      * @returns {Uint8Array}
      */
     esds: function (stream, codecPrivateData) {
-        return Atom("esds", concat(4, [0x03, 0x19], itobe2(stream), [0x00, 0x04, 0x11, 0x40, 0x15], 11, [0x05, 0x02], hexToBytes(codecPrivateData), [0x06, 0x01, 0x02]));
+        return createAtom("esds", concat(4, [0x03, 0x19], itobe2(stream), [0x00, 0x04, 0x11, 0x40, 0x15], 11, [0x05, 0x02], hexToBytes(codecPrivateData), [0x06, 0x01, 0x02]));
     },
     /**
      * @param {string} dataFormat - four letters (eg "avc1")
@@ -191,14 +190,7 @@ var atoms = {
         if (__DEV__) {
             assert(dataFormat.length === 4, "wrong data format length");
         }
-        return Atom("frma", strToBytes(dataFormat));
-    },
-    /**
-     * @param {Number} length
-     * @returns {Uint8Array}
-     */
-    free: function (length) {
-        return Atom("free", new Uint8Array(length - 8));
+        return createAtom("frma", strToBytes(dataFormat));
     },
     /**
      * @param {string} majorBrand
@@ -206,7 +198,7 @@ var atoms = {
      * @returns {Uint8Array}
      */
     ftyp: function (majorBrand, brands) {
-        return Atom("ftyp", concat.apply(null, [
+        return createAtom("ftyp", concat.apply(null, [
             strToBytes(majorBrand),
             [0, 0, 0, 1],
         ].concat(brands.map(strToBytes))));
@@ -232,7 +224,7 @@ var atoms = {
                 handlerName = "";
                 break;
         }
-        return Atom("hdlr", concat(8, strToBytes(name), 12, strToBytes(handlerName), 1 // handler name is C-style string (0 terminated)
+        return createAtom("hdlr", concat(8, strToBytes(name), 12, strToBytes(handlerName), 1 // handler name is C-style string (0 terminated)
         ));
     },
     /**
@@ -240,15 +232,7 @@ var atoms = {
      * @returns {Uint8Array}
      */
     mdhd: function (timescale) {
-        return Atom("mdhd", concat(12, itobe4(timescale), 8));
-    },
-    /**
-     * @param {Uint8Array} mfhd
-     * @param {Uint8Array} traf
-     * @returns {Uint8Array}
-     */
-    moof: function (mfhd, traf) {
-        return atoms.mult("moof", [mfhd, traf]);
+        return createAtom("mdhd", concat(12, itobe4(timescale), 8));
     },
     /**
      * @param {string} name - "mp4a" or "enca"
@@ -266,7 +250,7 @@ var atoms = {
         if (__DEV__) {
             assert(name !== "enca" || sinf instanceof Uint8Array);
         }
-        return Atom(name, concat(6, itobe2(drefIdx), 8, itobe2(channelsCount), itobe2(sampleSize), 2, itobe2(packetSize), itobe2(sampleRate), 2, esds, (name === "enca") ? sinf || [] : []));
+        return createAtom(name, concat(6, itobe2(drefIdx), 8, itobe2(channelsCount), itobe2(sampleSize), 2, itobe2(packetSize), itobe2(sampleRate), 2, esds, (name === "enca") ? sinf || [] : []));
     },
     /**
      * @param {Number} timescale
@@ -274,7 +258,7 @@ var atoms = {
      * @returns {Uint8Array}
      */
     mvhd: function (timescale, trackId) {
-        return Atom("mvhd", concat(12, itobe4(timescale), 4, [0, 1], 2, // we assume rate = 1;
+        return createAtom("mvhd", concat(12, itobe4(timescale), 4, [0, 1], 2, // we assume rate = 1;
         [1, 0], 10, // we assume volume = 100%;
         [0, 1], 14, // default matrix
         [0, 1], 14, // default matrix
@@ -304,7 +288,7 @@ var atoms = {
             version = 0;
             kidList = [];
         }
-        return Atom("pssh", concat([version, 0, 0, 0], hexToBytes(_systemId), kidList, itobe4(privateData.length), privateData));
+        return createAtom("pssh", concat([version, 0, 0, 0], hexToBytes(_systemId), kidList, itobe4(privateData.length), privateData));
     },
     /**
      * @param {Uint8Array} mfhd
@@ -314,7 +298,7 @@ var atoms = {
      * @returns {Uint8Array}
      */
     saio: function (mfhd, tfhd, tfdt, trun) {
-        return Atom("saio", concat(4, [0, 0, 0, 1], // ??
+        return createAtom("saio", concat(4, [0, 0, 0, 1], // ??
         itobe4(mfhd.length +
             tfhd.length +
             tfdt.length +
@@ -322,27 +306,27 @@ var atoms = {
             8 + 8 + 8 + 8)));
     },
     /**
-     * @param {Uint8Array} sencData - including 8 bytes flags and entries count
+     * @param {Uint8Array} sencContent - including 8 bytes flags and entries count
      * @returns {Uint8Array}
      */
-    saiz: function (senc) {
-        if (senc.length === 0) {
-            return Atom("saiz", new Uint8Array(0));
+    saiz: function (sencContent) {
+        if (sencContent.length === 0) {
+            return createAtom("saiz", new Uint8Array(0));
         }
-        var flags = be4toi(senc, 0);
-        var entries = be4toi(senc, 4);
+        var flags = be4toi(sencContent, 0);
+        var entries = be4toi(sencContent, 4);
         var arr = new Uint8Array(entries + 9);
         arr.set(itobe4(entries), 5);
         var i = 9;
         var j = 8;
         var pairsCnt;
         var pairsLen;
-        while (j < senc.length) {
+        while (j < sencContent.length) {
             j += 8; // assuming IV is 8 bytes TODO handle 16 bytes IV
             // if we have extradata for each entry
             if ((flags & 0x2) === 0x2) {
                 pairsLen = 2;
-                pairsCnt = be2toi(senc, j);
+                pairsCnt = be2toi(sencContent, j);
                 j += (pairsCnt * 6) + 2;
             }
             else {
@@ -352,7 +336,7 @@ var atoms = {
             arr[i] = pairsCnt * 6 + 8 + pairsLen;
             i++;
         }
-        return Atom("saiz", arr);
+        return createAtom("saiz", arr);
     },
     /**
      * @param {string} schemeType - four letters (eg "cenc" for Common Encryption)
@@ -363,20 +347,13 @@ var atoms = {
         if (__DEV__) {
             assert(schemeType.length === 4, "wrong scheme type length");
         }
-        return Atom("schm", concat(4, strToBytes(schemeType), itobe4(schemeVersion)));
-    },
-    /**
-     * @param {Uint8Array} buf
-     * @returns {Uint8Array}
-     */
-    senc: function (buf) {
-        return Atom("senc", buf);
+        return createAtom("schm", concat(4, strToBytes(schemeType), itobe4(schemeVersion)));
     },
     /**
      * @returns {Uint8Array}
      */
     smhd: function () {
-        return Atom("smhd", new Uint8Array(8));
+        return createAtom("smhd", new Uint8Array(8));
     },
     /**
      * @param {Array.<Uint8Array>} representations - arrays of Uint8Array,
@@ -386,7 +363,7 @@ var atoms = {
     stsd: function (reps) {
         // only one description here... FIXME
         var arrBase = [7, [reps.length]];
-        return Atom("stsd", concat.apply(void 0, arrBase.concat(reps)));
+        return createAtom("stsd", concat.apply(void 0, arrBase.concat(reps)));
     },
     /**
      * @param {Number} width
@@ -395,7 +372,7 @@ var atoms = {
      * @returns {Uint8Array}
      */
     tkhd: function (width, height, trackId) {
-        return Atom("tkhd", concat(itobe4(1 + 2 + 4), 8, // we assume track is enabled,
+        return createAtom("tkhd", concat(itobe4(1 + 2 + 4), 8, // we assume track is enabled,
         // in media and in preview.
         itobe4(trackId), 20, // we assume trackId = 1;
         [1, 0, 0, 0], // we assume volume = 100%;
@@ -412,14 +389,7 @@ var atoms = {
      */
     trex: function (trackId) {
         // default sample desc idx = 1
-        return Atom("trex", concat(4, itobe4(trackId), [0, 0, 0, 1], 12));
-    },
-    /**
-     * @param {Number} decodeTime
-     * @returns {Uint8Array}
-     */
-    tfdt: function (decodeTime) {
-        return Atom("tfdt", concat([1, 0, 0, 0], itobe8(decodeTime)));
+        return createAtom("trex", concat(4, itobe4(trackId), [0, 0, 0, 1], 12));
     },
     /**
      * @param {Number} algId - eg 1
@@ -431,22 +401,7 @@ var atoms = {
         if (__DEV__) {
             assert(keyId.length === 32, "wrong default KID length");
         }
-        return Atom("tenc", concat(6, [algId, ivSize], hexToBytes(keyId)));
-    },
-    /**
-     * @param {Uint8Array} tfhd
-     * @param {Uint8Array} tfdt
-     * @param {Uint8Array} trun
-     * @param {Uint8Array} senc
-     * @param {Uint8Array} mfhd
-     * @returns {Uint8Array}
-     */
-    traf: function (tfhd, tfdt, trun, mfhd, senc) {
-        var trafs = [tfhd, tfdt, trun];
-        if (senc) {
-            trafs.push(atoms.senc(senc), atoms.saiz(senc), atoms.saio(mfhd, tfhd, tfdt, trun));
-        }
-        return atoms.mult("traf", trafs);
+        return createAtom("tenc", concat(6, [algId, ivSize], hexToBytes(keyId)));
     },
     /**
      * @param {Uint8Array} oldtrun
@@ -474,33 +429,7 @@ var atoms = {
     vmhd: function () {
         var arr = new Uint8Array(12);
         arr[3] = 1; // QuickTime...
-        return Atom("vmhd", arr);
-    },
-};
-var reads = {
-    /**
-     * Extract senc data (derived from UUID MS Atom)
-     * @param {Uint8Array} traf
-     * @returns {Uint8Array|undefined}
-     */
-    senc: function (traf) {
-        return readUuid(traf, 0xA2394F52, 0x5A9B4F14, 0xA2446C42, 0x7C648DF4);
-    },
-    /**
-     * Extract tfxd data (derived from UUID MS Atom)
-     * @param {Uint8Array} traf
-     * @returns {Uint8Array|undefined}
-     */
-    tfxd: function (traf) {
-        return readUuid(traf, 0x6D1D9B05, 0x42D544E6, 0x80E2141D, 0xAFF757B2);
-    },
-    /**
-     * Extract tfrf data (derived from UUID MS Atom)
-     * @param {Uint8Array} traf
-     * @returns {Uint8Array|undefined}
-     */
-    tfrf: function (traf) {
-        return readUuid(traf, 0xD4807EF2, 0XCA394695, 0X8E5426CB, 0X9E46A79F);
+        return createAtom("vmhd", arr);
     },
 };
 /**
@@ -541,49 +470,7 @@ function moovChildren(mvhd, mvex, trak, pssList) {
     return moov;
 }
 /**
- * /!\ Mutates given segment
- * @param {Uint8Array} segment
- * @param {Number} trunoffset
- * @param {Number} dataoffset
- */
-function patchTrunDataOffset(segment, trunoffset, dataOffset) {
-    // patch trun dataoffset with new moof atom size
-    segment.set(itobe4(dataOffset), trunoffset + 16);
-}
-/**
- * @param {Uint8Array} segment
- * @param {Uint8Array} newmoof
- * @param {Uint8Array} oldmoof
- * @param {Number} trunoffset
- * @returns {Uint8Array}
- */
-function createNewSegment(segment, newmoof, oldmoof, trunoffset) {
-    var segmentlen = segment.length;
-    var newmooflen = newmoof.length;
-    var oldmooflen = oldmoof.length;
-    var mdat = segment.subarray(oldmooflen, segmentlen);
-    var newSegment = new Uint8Array(newmooflen + (segmentlen - oldmooflen));
-    newSegment.set(newmoof, 0);
-    newSegment.set(mdat, newmooflen);
-    patchTrunDataOffset(newSegment, trunoffset, newmoof.length + 8);
-    return newSegment;
-}
-/**
- * /!\ Mutates given segment
- * @param {Uint8Array} segment
- * @param {Uint8Array} newmoof
- * @param {Uint8Array} oldmoof
- * @param {Number} trunoffset
- * @returns {Uint8Array}
- */
-function patchSegmentInPlace(segment, newmoof, oldmoof, trunoffset) {
-    var free = oldmoof.length - newmoof.length;
-    segment.set(newmoof, 0);
-    segment.set(atoms.free(free), newmoof.length);
-    patchTrunDataOffset(segment, trunoffset, newmoof.length + 8 + free);
-    return segment;
-}
-/**
+ * Create an initialization segment with the informations given.
  * @param {Number} timescale
  * @param {string} type
  * @param {Uint8Array} stsd
@@ -595,39 +482,112 @@ function patchSegmentInPlace(segment, newmoof, oldmoof, trunoffset) {
  * @returns {Uint8Array}
  */
 function createInitSegment(timescale, type, stsd, mhd, width, height, pssList) {
-    var stbl = atoms.mult("stbl", [
+    var stbl = createAtomWithChildren("stbl", [
         stsd,
-        Atom("stts", new Uint8Array(0x08)),
-        Atom("stsc", new Uint8Array(0x08)),
-        Atom("stsz", new Uint8Array(0x0c)),
-        Atom("stco", new Uint8Array(0x08)),
+        createAtom("stts", new Uint8Array(0x08)),
+        createAtom("stsc", new Uint8Array(0x08)),
+        createAtom("stsz", new Uint8Array(0x0c)),
+        createAtom("stco", new Uint8Array(0x08)),
     ]);
-    var url = Atom("url ", new Uint8Array([0, 0, 0, 1]));
+    var url = createAtom("url ", new Uint8Array([0, 0, 0, 1]));
     var dref = atoms.dref(url);
-    var dinf = atoms.mult("dinf", [dref]);
-    var minf = atoms.mult("minf", [mhd, dinf, stbl]);
+    var dinf = createAtomWithChildren("dinf", [dref]);
+    var minf = createAtomWithChildren("minf", [mhd, dinf, stbl]);
     var hdlr = atoms.hdlr(type);
     var mdhd = atoms.mdhd(timescale); // this one is really important
-    var mdia = atoms.mult("mdia", [mdhd, hdlr, minf]);
+    var mdia = createAtomWithChildren("mdia", [mdhd, hdlr, minf]);
     var tkhd = atoms.tkhd(width, height, 1);
-    var trak = atoms.mult("trak", [tkhd, mdia]);
+    var trak = createAtomWithChildren("trak", [tkhd, mdia]);
     var trex = atoms.trex(1);
-    var mvex = atoms.mult("mvex", [trex]);
+    var mvex = createAtomWithChildren("mvex", [trex]);
     var mvhd = atoms.mvhd(timescale, 1); // in fact, we don't give a sh** about
     // this value :O
-    var moov = atoms.mult("moov", moovChildren(mvhd, mvex, trak, pssList));
+    var moov = createAtomWithChildren("moov", moovChildren(mvhd, mvex, trak, pssList));
     var ftyp = atoms.ftyp("isom", ["isom", "iso2", "iso6", "avc1", "dash"]);
     return concat(ftyp, moov);
 }
+/**
+ * Create tfdt box from a decoding time.
+ * @param {number} decodeTime
+ * @returns {Uint8Array}
+ */
+function createTfdtBox(decodeTime) {
+    return createAtom("tfdt", concat([1, 0, 0, 0], itobe8(decodeTime)));
+}
+/**
+ * @param {Uint8Array} trun
+ * @returns {Uint8Array}
+ */
+function addDataOffsetInTrun(trun) {
+    var lastFlags = trun[11];
+    var hasDataOffset = lastFlags & 0x01;
+    if (hasDataOffset) {
+        return trun;
+    }
+    // If no dataoffset is present, we add one
+    var newTrun = new Uint8Array(trun.length + 4);
+    newTrun.set(itobe4(trun.length + 4), 0); // original length + data_offset size
+    newTrun.set(trun.subarray(4, 16), 4); // name + (version + flags) + samplecount
+    newTrun[11] = newTrun[11] | 0x01; // add data_offset flag
+    newTrun.set([0, 0, 0, 0], 16); // add data offset
+    newTrun.set(trun.subarray(16, trun.length), 20);
+    return newTrun;
+}
+/**
+ * @param {Number} length
+ * @returns {Uint8Array}
+ */
+function createFreeBox(length) {
+    return createAtom("free", new Uint8Array(length - 8));
+}
+function createTrafBox(tfhd, tfdt, trun, mfhd, senc) {
+    var trafs = [tfhd, tfdt, trun];
+    if (senc) {
+        trafs.push(createAtom("senc", senc), atoms.saiz(senc), atoms.saio(mfhd, tfhd, tfdt, trun));
+    }
+    return createAtomWithChildren("traf", trafs);
+}
+/**
+ * Replace a moof in a segment by a new one.
+ * @param {Uint8Array} segment
+ * @param {Uint8Array} newMoof
+ * @param {Array.<number>} moofOffsets
+ * @param {number} trunOffsetInMoof
+ * @returns {Uint8Array}
+ */
+function replaceMoofInSegment(segment, newMoof, moofOffsets, trunOffsetInMoof) {
+    var oldMoofLength = moofOffsets[1] - moofOffsets[0];
+    var moofDelta = newMoof.length - oldMoofLength;
+    var mdatOffsets = getBoxOffsets(segment, 0x6D646174 /* "mdat" */);
+    if (mdatOffsets == null) {
+        throw new Error("Smooth: Invalid ISOBMFF given");
+    }
+    if (canPatchISOBMFFSegment() && (moofDelta === 0 || moofDelta <= -8)) {
+        // patch trun data_offset
+        newMoof.set(itobe4(mdatOffsets[0] + 8), trunOffsetInMoof + 16);
+        segment.set(newMoof, moofOffsets[0]);
+        if (moofDelta <= -8) {
+            segment.set(createFreeBox(-moofDelta), newMoof.length);
+        }
+        return segment;
+    }
+    // patch trun data_offset
+    newMoof.set(itobe4(mdatOffsets[0] + moofDelta + 8), trunOffsetInMoof + 16);
+    var newSegment = new Uint8Array(segment.length + moofDelta);
+    var beforeMoof = segment.subarray(0, moofOffsets[0]);
+    var afterMoof = segment.subarray(moofOffsets[1], segment.length);
+    newSegment.set(beforeMoof, 0);
+    newSegment.set(newMoof, beforeMoof.length);
+    newSegment.set(afterMoof, beforeMoof.length + newMoof.length);
+    return newSegment;
+}
 export default {
-    getMdat: getMDAT,
-    getTraf: getTRAF,
     /**
      * @param {Uint8Array} traf
      * @returns {Array.<Object>}
      */
     parseTfrf: function (traf) {
-        var tfrf = reads.tfrf(traf);
+        var tfrf = getUuidContent(traf, 0xD4807EF2, 0XCA394695, 0X8E5426CB, 0X9E46A79F);
         if (!tfrf) {
             return [];
         }
@@ -657,13 +617,14 @@ export default {
      * @returns {Object|undefined}
      */
     parseTfxd: function (traf) {
-        var tfxd = reads.tfxd(traf);
-        if (tfxd) {
-            return {
-                duration: be8toi(tfxd, 12),
-                time: be8toi(tfxd, 4),
-            };
+        var tfxd = getUuidContent(traf, 0x6D1D9B05, 0x42D544E6, 0x80E2141D, 0xAFF757B2);
+        if (tfxd == null) {
+            return undefined;
         }
+        return {
+            duration: be8toi(tfxd, 12),
+            time: be8toi(tfxd, 4),
+        };
     },
     /**
      * Return full video Init segment as Uint8Array
@@ -699,10 +660,10 @@ export default {
         }
         else {
             var tenc = atoms.tenc(1, 8, keyId);
-            var schi = atoms.mult("schi", [tenc]);
+            var schi = createAtomWithChildren("schi", [tenc]);
             var schm = atoms.schm("cenc", 65536);
             var frma = atoms.frma("avc1");
-            var sinf = atoms.mult("sinf", [frma, schm, schi]);
+            var sinf = createAtomWithChildren("sinf", [frma, schm, schi]);
             var encv = atoms.avc1encv("encv", 1, width, height, hRes, vRes, "AVC Coding", 24, avcc, sinf);
             stsd = atoms.stsd([encv]);
         }
@@ -733,59 +694,47 @@ export default {
         }
         else {
             var tenc = atoms.tenc(1, 8, keyId);
-            var schi = atoms.mult("schi", [tenc]);
+            var schi = createAtomWithChildren("schi", [tenc]);
             var schm = atoms.schm("cenc", 65536);
             var frma = atoms.frma("mp4a");
-            var sinf = atoms.mult("sinf", [frma, schm, schi]);
+            var sinf = createAtomWithChildren("sinf", [frma, schm, schi]);
             var enca = atoms.mp4aenca("enca", 1, channelsCount, sampleSize, packetSize, sampleRate, esds, sinf);
             stsd = atoms.stsd([enca]);
         }
         return createInitSegment(timescale, "audio", stsd, atoms.smhd(), 0, 0, _pssList);
     },
     /**
-     * Add decodeTime info in a segment (tfdt box)
+     * Patch ISOBMFF Segment downloaded in Smooth Streaming.
      * @param {Uint8Array} segment
      * @param {Number} decodeTime
      * @return {Uint8Array}
      */
     patchSegment: function (segment, decodeTime) {
-        if (__DEV__) {
-            // TODO handle segments with styp/free...
-            var name_1 = bytesToStr(segment.subarray(4, 8));
-            assert(name_1 === "moof");
+        var moofOffsets = getBoxOffsets(segment, 0x6d6f6f66 /* moof */);
+        if (moofOffsets == null) {
+            throw new Error("Smooth: Invalid ISOBMFF given");
         }
-        var oldmoof = segment.subarray(0, be4toi(segment, 0));
-        var newtfdt = atoms.tfdt(decodeTime);
-        // reads [moof[mfhd|traf[tfhd|trun|..]]]
-        var tfdtlen = newtfdt.length;
-        var mfhdlen = be4toi(oldmoof, 8);
-        var traflen = be4toi(oldmoof, mfhdlen + 8);
-        var tfhdlen = be4toi(oldmoof, mfhdlen + 8 + 8);
-        var trunlen = be4toi(oldmoof, mfhdlen + 8 + 8 + tfhdlen);
-        var oldmfhd = oldmoof.subarray(8, mfhdlen + 8);
-        var oldtraf = oldmoof
-            .subarray(mfhdlen + 8 + 8, mfhdlen + 8 + 8 + traflen - 8);
-        var oldtfhd = oldtraf.subarray(0, tfhdlen);
-        var oldtrun = oldtraf.subarray(tfhdlen, tfhdlen + trunlen);
+        var moofContent = segment.subarray(moofOffsets[0] + 8, moofOffsets[1]);
+        var mfhdBox = getBox(moofContent, 0x6d666864 /* mfhd */);
+        var trafContent = getBoxContent(moofContent, 0x74726166 /* traf */);
+        if (trafContent == null || mfhdBox == null) {
+            throw new Error("Smooth: Invalid ISOBMFF given");
+        }
+        var tfhdBox = getBox(trafContent, 0x74666864 /* tfhd */);
+        var trunBox = getBox(trafContent, 0x7472756e /* trun */);
+        if (tfhdBox == null || trunBox == null) {
+            throw new Error("Smooth: Invalid ISOBMFF given");
+        }
         // force trackId=1 since trackIds are not always reliable...
-        oldtfhd.set([0, 0, 0, 1], 12);
-        // TODO fallback?
-        var oldsenc = reads.senc(oldtraf);
-        // writes [moof[mfhd|traf[tfhd|tfdt|trun|senc|saiz|saio]]]
-        var newtrun = atoms.trun(oldtrun);
-        var newtraf = atoms.traf(oldtfhd, newtfdt, newtrun, oldmfhd, oldsenc);
-        var newmoof = atoms.moof(oldmfhd, newtraf);
-        var trunoffset = mfhdlen + 8 + 8 + tfhdlen + tfdtlen;
-        if (!canPatchISOBMFFSegment()) {
-            return createNewSegment(segment, newmoof, oldmoof, trunoffset);
-        }
-        else {
-            if (oldmoof.length - newmoof.length >= 8 /* minimum "free" atom size */) {
-                return patchSegmentInPlace(segment, newmoof, oldmoof, trunoffset);
-            }
-            else {
-                return createNewSegment(segment, newmoof, oldmoof, trunoffset);
-            }
-        }
+        tfhdBox.set([0, 0, 0, 1], 12);
+        var tfdtBox = createTfdtBox(decodeTime);
+        var newTrunBox = addDataOffsetInTrun(trunBox);
+        var sencContent = getUuidContent(trafContent, 0xA2394F52, 0x5A9B4F14, 0xA2446C42, 0x7C648DF4);
+        var newTrafBox = createTrafBox(tfhdBox, tfdtBox, newTrunBox, mfhdBox, sencContent);
+        var newMoof = createAtomWithChildren("moof", [mfhdBox, newTrafBox]);
+        var trunOffsetInMoof = mfhdBox.length + tfhdBox.length + tfdtBox.length +
+            8 /* moof size + name */ +
+            8 /* traf size + name */;
+        return replaceMoofInSegment(segment, newMoof, moofOffsets, trunOffsetInMoof);
     },
 };

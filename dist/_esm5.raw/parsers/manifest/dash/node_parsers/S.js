@@ -13,27 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import log from "../../../../log";
 /**
  * @param {Element} root
  * @returns {Object}
  */
 export default function parseS(root) {
-    var start;
-    var duration;
-    var repeatCount;
+    var parsedS = {};
     for (var j = 0; j < root.attributes.length; j++) {
         var attribute = root.attributes[j];
         switch (attribute.name) {
             case "t":
-                start = parseInt(attribute.value, 10);
+                var start = parseInt(attribute.value, 10);
+                if (isNaN(start)) {
+                    log.warn("DASH: invalid t (\"" + attribute.value + "\")");
+                }
+                else {
+                    parsedS.start = start;
+                }
                 break;
             case "d":
-                duration = parseInt(attribute.value, 10);
+                var duration = parseInt(attribute.value, 10);
+                if (isNaN(duration)) {
+                    log.warn("DASH: invalid d (\"" + attribute.value + "\")");
+                }
+                else {
+                    parsedS.duration = duration;
+                }
                 break;
             case "r":
-                repeatCount = parseInt(attribute.value, 10);
+                var repeatCount = parseInt(attribute.value, 10);
+                if (isNaN(repeatCount)) {
+                    log.warn("DASH: invalid r (\"" + attribute.value + "\")");
+                }
+                else {
+                    parsedS.repeatCount = repeatCount;
+                }
                 break;
         }
     }
-    return { start: start, duration: duration, repeatCount: repeatCount };
+    return parsedS;
 }

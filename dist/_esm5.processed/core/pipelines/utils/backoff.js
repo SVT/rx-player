@@ -29,7 +29,7 @@ function shouldRetry(error) {
         return false;
     }
     if (error.type === RequestErrorTypes.ERROR_HTTP_CODE) {
-        return error.status >= 500 || error.status === 404;
+        return error.status >= 500 || error.status === 404 || error.status === 412;
     }
     return (error.type === RequestErrorTypes.TIMEOUT ||
         error.type === RequestErrorTypes.ERROR_EVENT);

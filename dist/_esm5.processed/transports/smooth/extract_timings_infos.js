@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 import log from "../../log";
-import { getDurationFromTrun } from "../../parsers/containers/isobmff";
+import { getDurationFromTrun, getTRAF, } from "../../parsers/containers/isobmff";
 import mp4Utils from "./mp4_utils";
-var getTraf = mp4Utils.getTraf, parseTfrf = mp4Utils.parseTfrf, parseTfxd = mp4Utils.parseTfxd;
+var parseTfrf = mp4Utils.parseTfrf, parseTfxd = mp4Utils.parseTfxd;
 export default function extractTimingsInfos(responseData, segment, isLive) {
     var nextSegments = [];
     var segmentInfos;
     var tfxdSegment;
     var tfrfSegments;
     if (isLive) {
-        var traf = getTraf(responseData);
+        var traf = getTRAF(responseData);
         if (traf) {
             tfrfSegments = parseTfrf(traf);
             tfxdSegment = parseTfxd(traf);

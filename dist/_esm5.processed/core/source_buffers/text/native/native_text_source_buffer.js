@@ -27,6 +27,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import { addTextTrack, } from "../../../../compat";
+import removeCue from "../../../../compat/remove_cue";
 import log from "../../../../log";
 import AbstractSourceBuffer from "../../abstract_source_buffer";
 import parseTextTrackToCues from "./parsers";
@@ -100,17 +101,20 @@ var NativeTextSourceBuffer = /** @class */ (function (_super) {
         log.debug("NTSB: Removing native text track data", from, to);
         var track = this._track;
         var cues = track.cues;
-        for (var i = cues.length - 1; i >= 0; i--) {
-            var cue = cues[i];
-            var startTime = cue.startTime, endTime = cue.endTime;
-            if (startTime >= from && startTime <= to && endTime <= to) {
-                track.removeCue(cue);
+        if (cues != null) {
+            for (var i = cues.length - 1; i >= 0; i--) {
+                var cue = cues[i];
+                var startTime = cue.startTime, endTime = cue.endTime;
+                if (startTime >= from && startTime <= to && endTime <= to) {
+                    removeCue(track, cue);
+                }
             }
         }
         this.buffered.remove(from, to);
     };
     NativeTextSourceBuffer.prototype._abort = function () {
         log.debug("NTSB: Aborting native text track SourceBuffer");
+        this._remove(0, Infinity);
         var _a = this, _trackElement = _a._trackElement, _videoElement = _a._videoElement;
         if (_trackElement && _videoElement &&
             _videoElement.hasChildNodes()) {

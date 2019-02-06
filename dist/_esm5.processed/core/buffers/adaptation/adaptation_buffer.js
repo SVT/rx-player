@@ -23,8 +23,8 @@
  * download and push segments for a single Representation.
  */
 import objectAssign from "object-assign";
-import { concat as observableConcat, defer as observableDefer, merge as observableMerge, of as observableOf, ReplaySubject, Subject, } from "rxjs";
-import { distinctUntilChanged, filter, map, multicast, refCount, takeUntil, tap, } from "rxjs/operators";
+import { concat as observableConcat, defer as observableDefer, merge as observableMerge, of as observableOf, Subject, } from "rxjs";
+import { distinctUntilChanged, filter, ignoreElements, map, shareReplay, takeUntil, } from "rxjs/operators";
 import log from "../../../log";
 import concatMapLatest from "../../../utils/concat_map_latest";
 import EVENTS from "../events_generators";
@@ -61,11 +61,8 @@ export default function AdaptationBuffer(clock$, queuedSourceBuffer, segmentBook
             currentRepresentation.bitrate : undefined;
         return objectAssign({ downloadBitrate: downloadBitrate }, tick);
     }));
-    var abr$ = abrManager.get$(adaptation.type, abrClock$, adaptation.representations).pipe(
-    // equivalent to a sane shareReplay:
-    // https://github.com/ReactiveX/rxjs/issues/3336
-    // XXX TODO Replace it when that issue is resolved
-    multicast(function () { return new ReplaySubject(1); }), refCount());
+    var abr$ = abrManager.get$(adaptation.type, abrClock$, adaptation.representations)
+        .pipe(shareReplay({ refCount: true }));
     // emit when the current RepresentationBuffer should be stopped right now
     var killCurrentBuffer$ = new Subject();
     // emit when the current RepresentationBuffer should stop making new downloads
@@ -79,18 +76,12 @@ export default function AdaptationBuffer(clock$, queuedSourceBuffer, segmentBook
         log.debug("Buffer: new " + adaptation.type + " bitrate estimation", bitrate);
         return EVENTS.bitrateEstimationChange(adaptation.type, bitrate);
     }));
-    var adaptationBuffer$ = abr$.pipe(distinctUntilChanged(function (a, b) {
+    var newRepresentation$ = abr$
+        .pipe(distinctUntilChanged(function (a, b) {
         return a.manual === b.manual && a.representation.id === b.representation.id;
-    }), tap(function (estimation) {
-        if (estimation.urgent) {
-            log.info("Buffer: urgent Representation switch", adaptation.type);
-            killCurrentBuffer$.next();
-        }
-        else {
-            log.info("Buffer: slow Representation switch", adaptation.type);
-            terminateCurrentBuffer$.next();
-        }
-    }), concatMapLatest(function (estimate, i) {
+    }));
+    var adaptationBuffer$ = observableMerge(newRepresentation$
+        .pipe(concatMapLatest(function (estimate, i) {
         var representation = estimate.representation;
         currentRepresentation = representation;
         // Manual switch needs an immediate feedback.
@@ -102,7 +93,21 @@ export default function AdaptationBuffer(clock$, queuedSourceBuffer, segmentBook
         var representationBuffer$ = createRepresentationBuffer(representation)
             .pipe(takeUntil(killCurrentBuffer$));
         return observableConcat(representationChange$, representationBuffer$);
-    }));
+    })), newRepresentation$.pipe(map(function (estimation, i) {
+        if (i === 0) { // no buffer pending
+            return;
+        }
+        if (estimation.urgent) {
+            log.info("Buffer: urgent Representation switch", adaptation.type);
+            // kill current buffer after concatMapLatest has been called
+            killCurrentBuffer$.next();
+        }
+        else {
+            log.info("Buffer: slow Representation switch", adaptation.type);
+            // terminate current buffer after concatMapLatest has been called
+            terminateCurrentBuffer$.next();
+        }
+    }), ignoreElements()));
     return observableMerge(adaptationBuffer$, bitrateEstimate$);
     /**
      * Create and returns a new RepresentationBuffer Observable, linked to the

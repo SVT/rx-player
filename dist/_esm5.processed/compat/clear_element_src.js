@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import log from "../log";
+import { isFirefox } from "./browser_detection";
 /**
  * Clear element's src attribute.
  *
@@ -22,6 +24,25 @@
  * @param {HTMLMediaElement} element
  */
 export default function clearElementSrc(element) {
+    if (isFirefox) {
+        var textTracks = element.textTracks;
+        for (var i = 0; i < textTracks.length; i++) {
+            textTracks[i].mode = "disabled";
+        }
+        if (element.hasChildNodes()) {
+            var childNodes = element.childNodes;
+            for (var j = childNodes.length - 1; j >= 0; j--) {
+                if (childNodes[j].nodeName === "track") {
+                    try {
+                        element.removeChild(childNodes[j]);
+                    }
+                    catch (err) {
+                        log.warn("Could not remove text track child from element.");
+                    }
+                }
+            }
+        }
+    }
     element.src = "";
     element.removeAttribute("src");
 }
