@@ -70,6 +70,7 @@ export default function getLoadedContentState(
       PLAYER_STATES.SEEKING :
       PLAYER_STATES.BUFFERING;
   }
+
   return isPlaying ? PLAYER_STATES.PLAYING : PLAYER_STATES.PAUSED;
 
 }
