@@ -35,8 +35,6 @@ export default function addTextTrack(mediaElement, hidden) {
         track.mode = hidden ? track.HIDDEN : track.SHOWING;
     }
     else {
-        // there is no removeTextTrack method... so we need to reuse old
-        // text-tracks objects and clean all its pending cues
         trackElement = document.createElement("track");
         mediaElement.appendChild(trackElement);
         track = trackElement.track;

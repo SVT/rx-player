@@ -6943,7 +6943,7 @@ object-assign
             return endTime <= startTime ? (
             // IE/Edge will throw in this case.
             // See issue #501
-            _log__WEBPACK_IMPORTED_MODULE_0__.a.warn("Invalid cue times: " + startTime + " - " + endTime), 
+            _log__WEBPACK_IMPORTED_MODULE_0__.a.warn("Compat: Invalid cue times: " + startTime + " - " + endTime), 
             null) : new _browser_compatibility_types__WEBPACK_IMPORTED_MODULE_1__.d(startTime, endTime, payload);
         }
         /***/    }, 
@@ -9573,10 +9573,7 @@ object-assign
             if (_browser_detection__WEBPACK_IMPORTED_MODULE_0__.c) {
                 var tracksLength = mediaElement.textTracks.length;
                 (track = 0 < tracksLength ? mediaElement.textTracks[tracksLength - 1] : mediaElement.addTextTrack("subtitles")).mode = hidden ? track.HIDDEN : track.SHOWING;
-            } else 
-            // there is no removeTextTrack method... so we need to reuse old
-            // text-tracks objects and clean all its pending cues
-            trackElement = document.createElement("track"), mediaElement.appendChild(trackElement), 
+            } else trackElement = document.createElement("track"), mediaElement.appendChild(trackElement), 
             track = trackElement.track, trackElement.kind = "subtitles", track.mode = hidden ? "hidden" : "showing";
             return {
                 track: track,
@@ -20267,6 +20264,7 @@ object-assign
                 id: null != rootAttributes.id ? rootAttributes.id : "gen-dash-manifest-" + generateManifestID(),
                 periods: parsedPeriods,
                 transportType: "dash",
+                lifetime: rootAttributes.minimumUpdatePeriod,
                 isLive: isDynamic,
                 uris: [ uri ].concat(rootChildren.locations),
                 suggestedPresentationDelay: null != rootAttributes.suggestedPresentationDelay ? rootAttributes.suggestedPresentationDelay : config.a.DEFAULT_SUGGESTED_PRESENTATION_DELAY.DASH,

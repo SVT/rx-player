@@ -31,7 +31,7 @@ export default function makeCue(startTime, endTime, payload) {
     if (startTime >= endTime) {
         // IE/Edge will throw in this case.
         // See issue #501
-        log.warn("Invalid cue times: " + startTime + " - " + endTime);
+        log.warn("Compat: Invalid cue times: " + startTime + " - " + endTime);
         return null;
     }
     return new VTTCue_(startTime, endTime, payload);
