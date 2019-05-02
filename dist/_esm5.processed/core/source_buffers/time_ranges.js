@@ -26,7 +26,7 @@ var ManualTimeRanges = /** @class */ (function () {
         this.length = 0;
     }
     ManualTimeRanges.prototype.insert = function (start, end) {
-        if (__DEV__) {
+        if (false) {
             assert(start >= 0, "invalid start time");
             assert(end - start > 0, "invalid end time");
         }
@@ -34,7 +34,7 @@ var ManualTimeRanges = /** @class */ (function () {
         this.length = this._ranges.length;
     };
     ManualTimeRanges.prototype.remove = function (start, end) {
-        if (__DEV__) {
+        if (false) {
             assert(start >= 0, "invalid start time");
             assert(end - start > 0, "invalid end time");
         }

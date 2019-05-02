@@ -64,7 +64,7 @@ var generateSegmentLoader = function (customSegmentLoader) { return function (_a
                 );
                 break;
             default:
-                if (__DEV__) {
+                if (false) {
                     assert(false, "responseData should have been set");
                 }
                 responseData = new Uint8Array(0);

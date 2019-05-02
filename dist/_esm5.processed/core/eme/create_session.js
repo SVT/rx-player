@@ -62,7 +62,7 @@ export default function createSession(initData, initDataType, mediaKeysInfos) {
         var session = sessionsStore.createSession(initData, initDataType, sessionType);
         // Re-check for Dumb typescript
         if (!hasPersistence || !sessionStorage || !keySystemOptions.persistentLicense) {
-            if (__DEV__) {
+            if (false) {
                 assert(sessionType === "temporary");
             }
             return observableOf({
@@ -70,7 +70,7 @@ export default function createSession(initData, initDataType, mediaKeysInfos) {
                 value: { mediaKeySession: session, sessionType: sessionType },
             });
         }
-        if (__DEV__) {
+        if (false) {
             assert(sessionType === "persistent-license");
         }
         var storedEntry = sessionStorage.get(initData, initDataType);

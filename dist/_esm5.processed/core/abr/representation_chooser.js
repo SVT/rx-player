@@ -367,7 +367,7 @@ var RepresentationChooser = /** @class */ (function () {
      */
     RepresentationChooser.prototype.addPendingRequest = function (id, payload) {
         if (this._currentRequests[id]) {
-            if (__DEV__) {
+            if (false) {
                 throw new Error("ABR: request already added.");
             }
             log.warn("ABR: request already added.");
@@ -392,7 +392,7 @@ var RepresentationChooser = /** @class */ (function () {
     RepresentationChooser.prototype.addRequestProgress = function (id, progress) {
         var request = this._currentRequests[id];
         if (!request) {
-            if (__DEV__) {
+            if (false) {
                 throw new Error("ABR: progress for a request not added");
             }
             log.warn("ABR: progress for a request not added");
@@ -407,7 +407,7 @@ var RepresentationChooser = /** @class */ (function () {
      */
     RepresentationChooser.prototype.removePendingRequest = function (id) {
         if (!this._currentRequests[id]) {
-            if (__DEV__) {
+            if (false) {
                 throw new Error("ABR: can't remove unknown request");
             }
             log.warn("ABR: can't remove unknown request");

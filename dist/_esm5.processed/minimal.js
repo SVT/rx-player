@@ -35,8 +35,8 @@ var __extends = (this && this.__extends) || (function () {
 import Player from "./core/api";
 import { addFeatures, } from "./features";
 import logger from "./log";
-if (__DEV__) {
-    logger.setLevel(__LOGGER_LEVEL__);
+if (false) {
+    logger.setLevel("NONE");
 }
 /**
  * Minimal Player for which you can features at will:

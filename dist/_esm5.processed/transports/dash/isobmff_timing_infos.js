@@ -94,7 +94,7 @@ function getISOBMFFTimingInfos(segment, buffer, sidxSegments, initInfos) {
             duration = segmentDuration;
         }
     }
-    if (__DEV__) {
+    if (false) {
         assert(startTime != null);
         assert(duration != null);
     }
